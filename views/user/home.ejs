@@ -356,7 +356,7 @@
 													<li><a href="cart.html">Cart</a></li>
 													<li><a href="checkout.html">Checkout</a></li>
 													<li><a href="contact.html">Contact</a></li>
-													<li><a href="shop.html">Shop</a></li>
+													<li><a href="/shop">Shop</a></li>
 													<li><a href="shop-list.html">Shop List</a></li>
 													<li><a href="product-details.html">Product Details</a></li>
 													<li><a href="/myaccount">My Account</a></li>
@@ -376,23 +376,23 @@
 		<!-- End Main Menu Area -->
 
 		<!-- Main Slider Area -->
-		<div class="main-slider-area home-2">
+		<!-- <div class="main-slider-area home-2">
 			<div class="container">
 				<div class="row">
 					<div class="col-md-12">
 						<!-- Main Slider -->
-						<div class="main-slider">
+						<!-- <div class="main-slider">
 							<div class="slider">
 								<div id="mainSlider" class="nivoSlider slider-image">
 									<a href="#"><img src="assets/images/slider/slider3.webp" alt="main slider"></a>
 									<a href="#"><img src="assets/images/slider/slider4.webp" alt="main slider"></a>
 								</div>
 							</div>
-						</div><!-- End Main Slider -->
+						</div>
 					</div>
 				</div>
 			</div>
-		</div><!-- End Main Slider Area -->	
+		</div> -->
 		<!-- Top Banner Area -->
 		<div class="top-banner-area">
 			<div class="container">
@@ -400,37 +400,37 @@
 					<div class="col-md-4 col-sm-6">
 						<!-- Single Banner -->
 						<div class="single-banner">
-							<a href="#"><img src="assets/images/banner/banner10.webp" alt="banner"></a>
+							<a href="#"><img src="assets/images/banner/banner10.jpg" alt="banner"></a>
 						</div>
 					</div>
 					<div class="col-md-4 col-sm-6">
 						<!-- Single Banner -->
 						<div class="single-banner">
-							<a href="#"><img src="assets/images/banner/banner8.webp" alt="banner"></a>
+							<a href="#"><img src="assets/images/banner/banner8.jpeg" alt="banner"></a>
 						</div>
 					</div>
 					<div class="col-md-4 col-sm-6">
 						<!-- Single Banner -->
 						<div class="single-banner">
-							<a href="#"><img src="assets/images/banner/banner9.webp" alt="banner"></a>
+							<a href="#"><img src="assets/images/banner/banner9.jpeg" alt="banner"></a>
 						</div>
 					</div>				
 					<div class="col-md-4 col-sm-6">
 						<!-- Single Banner -->
 						<div class="single-banner">
-							<a href="#"><img src="assets/images/banner/banner1.webp" alt="banner"></a>
+							<a href="#"><img src="assets/images/banner/banner1.jpeg" alt="banner"></a>
 						</div>
 					</div>
 					<div class="col-md-4 col-sm-6">
 						<!-- Single Banner -->
 						<div class="single-banner">
-							<a href="#"><img src="assets/images/banner/banner2.webp" alt="banner"></a>
+							<a href="#"><img src="assets/images/banner/banner2.jpg" alt="banner"></a>
 						</div>
 					</div>
 					<div class="col-md-4 col-sm-6">
 						<!-- Single Banner -->
 						<div class="single-banner">
-							<a href="#"><img src="assets/images/banner/banner3.webp" alt="banner"></a>
+							<a href="#"><img src="assets/images/banner/banner3.jpg" alt="banner"></a>
 						</div>
 					</div>
 				</div>
@@ -457,15 +457,16 @@
 									<!-- Bestsell Carousel -->
 									<div id="bestsell-carousel" class="owl-carousel custom-carousel">
 										<!-- Single Product -->
+										 <% for(let i =0 ; i < products.length ; i++) { %>
 										<div class="singel-product single-product-col">
 											<div class="label-pro-new">New</div>
 											<!-- Single Product Image -->
 											<div class="single-product-img">
-												<a href="#"><img src="assets/images/products/s1.webp" alt="product"></a>
+												<a href="#"><img src="<%=products[i].productImage[0]%>" alt="product"></a>
 											</div>
 											<!-- Single Product Content -->
 											<div class="single-product-content">
-												<h2 class="product-name"><a title="Proin lectus ipsum" href="product-details.html">Proin lectus ipsum</a></h2>
+												<h2 class="product-name"><a title="Proin lectus ipsum"><%=products[i].productName%></a></h2>
 												<div class="ratings">
 													<div class="rating-box">  
 														<div class="rating">
@@ -478,7 +479,7 @@
 													</div>
 												</div>
 												<div class="product-price">
-													<p>$99.00</p>
+													<p>₹<%= products[i].salePrice%></p>
 												</div>
 												<!-- Single Product Actions -->
 												<div class="product-actions">
@@ -492,340 +493,12 @@
 													</div>
 												</div><!-- End Single Product Actions -->
 											</div><!-- End Single Product Content -->
-										</div><!-- End Single Product -->
-										<!-- Single Product -->
-										<div class="singel-product single-product-col">
-											<div class="label-pro-new">New</div>
-											<!-- Single Product Image -->
-											<div class="single-product-img">
-												<a href="#"><img src="assets/images/products/s2.webp" alt="product"></a>
-											</div>
-											<!-- Single Product Content -->
-											<div class="single-product-content">
-												<h2 class="product-name"><a title="Proin lectus ipsum" href="product-details.html">Aliquam consequat</a></h2>
-												<div class="ratings">
-													<div class="rating-box">  
-														<div class="rating">
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-														</div>  
-													</div>
-												</div>
-												<div class="product-price">
-													<p>$99.00</p>
-												</div>
-												<!-- Single Product Actions -->
-												<div class="product-actions">
-													<button class="button btn-cart" title="Add to Cart" type="button"><i class="fa fa-shopping-cart">&nbsp;</i><span>Add to Cart</span></button>
-													<div class="add-to-link">
-														<ul class="">
-															<li class="quic-view"><button type="button" data-bs-target="#productModal" data-bs-toggle="modal"><i class="fa fa-search"></i>Quick view</button></li>
-															<li class="wishlist"><a href="#"><i class="fa fa-heart"></i></a></li>
-															<li class="refresh"><a href="#"><i class="fa fa-refresh"></i></a></li>
-														</ul>
-													</div>
-												</div><!-- End Single Product Actions -->
-											</div><!-- End Single Product Content -->
-										</div><!-- End Single Product -->
-										<!-- Single Product -->
-										<div class="singel-product single-product-col">
-											<div class="label-pro-new">New</div>
-											<!-- Single Product Image -->
-											<div class="single-product-img">
-												<a href="#"><img src="assets/images/products/s3.webp" alt="product"></a>
-											</div>
-											<!-- Single Product Content -->
-											<div class="single-product-content">
-												<h2 class="product-name"><a title="Proin lectus ipsum" href="product-details.html">Fusce aliquam</a></h2>
-												<div class="ratings">
-													<div class="rating-box">  
-														<div class="rating">
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-														</div>  
-													</div>
-												</div>
-												<div class="product-price">
-													<p>$99.00</p>
-												</div>
-												<!-- Single Product Actions -->
-												<div class="product-actions">
-													<button class="button btn-cart" title="Add to Cart" type="button"><i class="fa fa-shopping-cart">&nbsp;</i><span>Add to Cart</span></button>
-													<div class="add-to-link">
-														<ul class="">
-															<li class="quic-view"><button type="button" data-bs-target="#productModal" data-bs-toggle="modal"><i class="fa fa-search"></i>Quick view</button></li>
-															<li class="wishlist"><a href="#"><i class="fa fa-heart"></i></a></li>
-															<li class="refresh"><a href="#"><i class="fa fa-refresh"></i></a></li>
-														</ul>
-													</div>
-												</div><!-- End Single Product Actions -->
-											</div><!-- End Single Product Content -->
-										</div><!-- End Single Product -->
-										<!-- Single Product -->
-										<div class="singel-product single-product-col">
-											<div class="label-pro-sale">hot</div>
-											<!-- Single Product Image -->
-											<div class="single-product-img">
-												<a href="#"><img src="assets/images/products/s4.webp" alt="product"></a>
-											</div>
-											<!-- Single Product Content -->
-											<div class="single-product-content">
-												<h2 class="product-name"><a title="Proin lectus ipsum" href="product-details.html">Pellentesque habitant </a></h2>
-												<div class="ratings">
-													<div class="rating-box">  
-														<div class="rating">
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-														</div>  
-													</div>
-												</div>
-												<div class="product-price">
-													<p><span>$345.00</span>$99.00</p>
-												</div>
-												<!-- Single Product Actions -->
-												<div class="product-actions">
-													<button class="button btn-cart" title="Add to Cart" type="button"><i class="fa fa-shopping-cart">&nbsp;</i><span>Add to Cart</span></button>
-													<div class="add-to-link">
-														<ul class="">
-															<li class="quic-view"><button type="button" data-bs-target="#productModal" data-bs-toggle="modal"><i class="fa fa-search"></i>Quick view</button></li>
-															<li class="wishlist"><a href="#"><i class="fa fa-heart"></i></a></li>
-															<li class="refresh"><a href="#"><i class="fa fa-refresh"></i></a></li>
-														</ul>
-													</div>
-												</div><!-- End Single Product Actions -->
-											</div><!-- End Single Product Content -->
-										</div><!-- End Single Product -->
-										<!-- Single Product -->
-										<div class="singel-product single-product-col">
-											<div class="label-pro-sale">hot</div>
-											<!-- Single Product Image -->
-											<div class="single-product-img">
-												<a href="#"><img src="assets/images/products/s5.webp" alt="product"></a>
-											</div>
-											<!-- Single Product Content -->
-											<div class="single-product-content">
-												<h2 class="product-name"><a title="Proin lectus ipsum" href="product-details.html">Quisque in arcu</a></h2>
-												<div class="ratings">
-													<div class="rating-box">  
-														<div class="rating">
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-														</div>  
-													</div>
-												</div>
-												<div class="product-price">
-													<p><span>$345.00</span>$99.00</p>
-												</div>
-												<!-- Single Product Actions -->
-												<div class="product-actions">
-													<button class="button btn-cart" title="Add to Cart" type="button"><i class="fa fa-shopping-cart">&nbsp;</i><span>Add to Cart</span></button>
-													<div class="add-to-link">
-														<ul class="">
-															<li class="quic-view"><button type="button" data-bs-target="#productModal" data-bs-toggle="modal"><i class="fa fa-search"></i>Quick view</button></li>
-															<li class="wishlist"><a href="#"><i class="fa fa-heart"></i></a></li>
-															<li class="refresh"><a href="#"><i class="fa fa-refresh"></i></a></li>
-														</ul>
-													</div>
-												</div><!-- End Single Product Actions -->
-											</div><!-- End Single Product Content -->
-										</div><!-- End Single Product -->
-										<!-- Single Product -->
-										<div class="singel-product single-product-col">
-											<div class="label-pro-new">New</div>
-											<!-- Single Product Image -->
-											<div class="single-product-img">
-												<a href="#"><img src="assets/images/products/s1.webp" alt="product"></a>
-											</div>
-											<!-- Single Product Content -->
-											<div class="single-product-content">
-												<h2 class="product-name"><a title="Proin lectus ipsum" href="product-details.html">Donec ac tempus </a></h2>
-												<div class="ratings">
-													<div class="rating-box">  
-														<div class="rating">
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-														</div>  
-													</div>
-												</div>
-												<div class="product-price">
-													<p>$99.00</p>
-												</div>
-												<!-- Single Product Actions -->
-												<div class="product-actions">
-													<button class="button btn-cart" title="Add to Cart" type="button"><i class="fa fa-shopping-cart">&nbsp;</i><span>Add to Cart</span></button>
-													<div class="add-to-link">
-														<ul class="">
-															<li class="quic-view"><button type="button" data-bs-target="#productModal" data-bs-toggle="modal"><i class="fa fa-search"></i>Quick view</button></li>
-															<li class="wishlist"><a href="#"><i class="fa fa-heart"></i></a></li>
-															<li class="refresh"><a href="#"><i class="fa fa-refresh"></i></a></li>
-														</ul>
-													</div>
-												</div><!-- End Single Product Actions -->
-											</div><!-- End Single Product Content -->
-										</div><!-- End Single Product -->
-										<!-- Single Product -->
-										<div class="singel-product single-product-col">
-											<div class="label-pro-sale">hot</div>
-											<!-- Single Product Image -->
-											<div class="single-product-img">
-												<a href="#"><img src="assets/images/products/s7.webp" alt="product"></a>
-											</div>
-											<!-- Single Product Content -->
-											<div class="single-product-content">
-												<h2 class="product-name"><a title="Proin lectus ipsum" href="product-details.html">voluptas nulla</a></h2>
-												<div class="ratings">
-													<div class="rating-box">  
-														<div class="rating">
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-														</div>  
-													</div>
-												</div>
-												<div class="product-price">
-													<p><span>$232.00</span>$132.00</p>
-												</div>
-												<!-- Single Product Actions -->
-												<div class="product-actions">
-													<button class="button btn-cart" title="Add to Cart" type="button"><i class="fa fa-shopping-cart">&nbsp;</i><span>Add to Cart</span></button>
-													<div class="add-to-link">
-														<ul class="">
-															<li class="quic-view"><button type="button" data-bs-target="#productModal" data-bs-toggle="modal"><i class="fa fa-search"></i>Quick view</button></li>
-															<li class="wishlist"><a href="#"><i class="fa fa-heart"></i></a></li>
-															<li class="refresh"><a href="#"><i class="fa fa-refresh"></i></a></li>
-														</ul>
-													</div>
-												</div><!-- End Single Product Actions -->
-											</div><!-- End Single Product Content -->
-										</div><!-- End Single Product -->
-										<!-- Single Product -->
-										<div class="singel-product single-product-col">
-											<div class="label-pro-new">New</div>
-											<!-- Single Product Image -->
-											<div class="single-product-img">
-												<a href="#"><img src="assets/images/products/s3.webp" alt="product"></a>
-											</div>
-											<!-- Single Product Content -->
-											<div class="single-product-content">
-												<h2 class="product-name"><a title="Proin lectus ipsum" href="product-details.html">Etiam gravida</a></h2>
-												<div class="ratings">
-													<div class="rating-box">  
-														<div class="rating">
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-														</div>  
-													</div>
-												</div>
-												<div class="product-price">
-													<p>$99.00</p>
-												</div>
-												<!-- Single Product Actions -->
-												<div class="product-actions">
-													<button class="button btn-cart" title="Add to Cart" type="button"><i class="fa fa-shopping-cart">&nbsp;</i><span>Add to Cart</span></button>
-													<div class="add-to-link">
-														<ul class="">
-															<li class="quic-view"><button type="button" data-bs-target="#productModal" data-bs-toggle="modal"><i class="fa fa-search"></i>Quick view</button></li>
-															<li class="wishlist"><a href="#"><i class="fa fa-heart"></i></a></li>
-															<li class="refresh"><a href="#"><i class="fa fa-refresh"></i></a></li>
-														</ul>
-													</div>
-												</div><!-- End Single Product Actions -->
-											</div><!-- End Single Product Content -->
-										</div><!-- End Single Product -->
-										<!-- Single Product -->
-										<div class="singel-product single-product-col">
-											<div class="label-pro-new">New</div>
-											<!-- Single Product Image -->
-											<div class="single-product-img">
-												<a href="#"><img src="assets/images/products/s8.webp" alt="product"></a>
-											</div>
-											<!-- Single Product Content -->
-											<div class="single-product-content">
-												<h2 class="product-name"><a title="Proin lectus ipsum" href="product-details.html">Proin lectus ipsum</a></h2>
-												<div class="ratings">
-													<div class="rating-box">  
-														<div class="rating">
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-														</div>  
-													</div>
-												</div>
-												<div class="product-price">
-													<p>$99.00</p>
-												</div>
-												<!-- Single Product Actions -->
-												<div class="product-actions">
-													<button class="button btn-cart" title="Add to Cart" type="button"><i class="fa fa-shopping-cart">&nbsp;</i><span>Add to Cart</span></button>
-													<div class="add-to-link">
-														<ul class="">
-															<li class="quic-view"><button type="button" data-bs-target="#productModal" data-bs-toggle="modal"><i class="fa fa-search"></i>Quick view</button></li>
-															<li class="wishlist"><a href="#"><i class="fa fa-heart"></i></a></li>
-															<li class="refresh"><a href="#"><i class="fa fa-refresh"></i></a></li>
-														</ul>
-													</div>
-												</div><!-- End Single Product Actions -->
-											</div><!-- End Single Product Content -->
-										</div><!-- End Single Product -->
-										<!-- Single Product -->
-										<div class="singel-product single-product-col">
-											<div class="label-pro-sale">hot</div>
-											<!-- Single Product Image -->
-											<div class="single-product-img">
-												<a href="#"><img src="assets/images/products/s9.webp" alt="product"></a>
-											</div>
-											<!-- Single Product Content -->
-											<div class="single-product-content">
-												<h2 class="product-name"><a title="Proin lectus ipsum" href="product-details.html">Proin lectus ipsum</a></h2>
-												<div class="ratings">
-													<div class="rating-box">  
-														<div class="rating">
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-														</div>  
-													</div>
-												</div>
-												<div class="product-price">
-													<p><span>$345.00</span>$99.00</p>
-												</div>
-												<!-- Single Product Actions -->
-												<div class="product-actions">
-													<button class="button btn-cart" title="Add to Cart" type="button"><i class="fa fa-shopping-cart">&nbsp;</i><span>Add to Cart</span></button>
-													<div class="add-to-link">
-														<ul class="">
-															<li class="quic-view"><button type="button" data-bs-target="#productModal" data-bs-toggle="modal"><i class="fa fa-search"></i>Quick view</button></li>
-															<li class="wishlist"><a href="#"><i class="fa fa-heart"></i></a></li>
-															<li class="refresh"><a href="#"><i class="fa fa-refresh"></i></a></li>
-														</ul>
-													</div>
-												</div><!-- End Single Product Actions -->
-											</div><!-- End Single Product Content -->
-										</div><!-- End Single Product -->
+										</div>
+										<% }%>
+										
+										
+										
+										
 									</div><!-- Bestsell Carousel -->
 								</div><!-- End Tab Pane-->
 								<!-- Tab Pane-->

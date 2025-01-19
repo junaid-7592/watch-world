@@ -56,7 +56,12 @@
 										<p><i class="fa fa-phone"></i>Call us toll free:<span>123456789</span></p>
 									</div>
 									<div class="header-login">
-										<a href="/login">Log in</a>
+										<%if(userCredit){%>
+										<a href="/logout">Logout</a>
+										<%}else{%>
+
+											<a href="/login">Login</a>
+											<%}%>
 									</div>
 								</div><!-- End Header Top Left-->
 							</div>
@@ -123,7 +128,7 @@
 								<!-- Header Actions Area-->
 								<div class="header-actions">
 									<div class="header-cart">
-										<a class="cart" href="#">
+										<a class="cart" href="/">
 											<i class="fa fa-shopping-cart"></i>
 											<span class="my-cart">Cart</span> - 2 items
 										</a>
@@ -217,4 +222,4 @@
 
 		</div>
 		<!-- End Header Area -->
-		
+		                     

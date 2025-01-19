@@ -22,7 +22,7 @@ const userSchema=new Schema({
     googleId:{          
         type:String,
         uniqe:true
-    },
+    }, 
     password:{
         type:String,
         required:false    //becouse while  single sign up  not use password

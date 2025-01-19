@@ -37,7 +37,7 @@
 	<link rel="stylesheet" href="assets/css/responsive.css">
 	<style>
 		.error-message {
-			color: red;
+			color: rgb(255, 42, 0);
 			font-size: 0.75rem;
 			display: none;
 		}
@@ -661,7 +661,7 @@
 										<input type="email" id="email" required class="form-control" name="email">
 										<div id="error2" class="error-message"></div>
 									</div>
-									<p style="color: red;" ><%= message %><p>
+									<!-- <p style="color: rgb(220, 30, 30);" ><%= message %><p> -->
 									<div class="form-goroup">
 										<label>Password <sup>*</sup></label>
 										<!-- Add id="password" -->
@@ -676,7 +676,12 @@
 											class="form-control" name="ConfirmPassword">
 										<div id="error4" class="error-message"></div>
 									</div>
-								
+									<%if(locals.message&& message.length>0){%>
+										<div class="alert alert-danger text-center">
+										  <%=message%>
+										</div>
+									 <%}%>
+									  
 
 									<div class="user-bottom-inner">
 										<!-- <a href="#">Forgot Your Password?</a> -->

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload & Crop</title>
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+
+        .upload-btn {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .crop-btn {
+            background: #2196F3;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .canvas-container {
+            margin-top: 20px;
+            border: 2px dashed #ccc;
+            padding: 10px;
+            position: relative;
+        }
+
+        canvas {
+            max-width: 100%;
+            border: 1px solid #ddd;
+            cursor: crosshair;
+        }
+
+        .result-container {
+            margin-top: 20px;
+        }
+
+        .cropped-image {
+            max-width: 100%;
+            border: 1px solid #ddd;
+            margin-top: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Image Upload & Crop</h2>
+        
+        <div>
+            <input type="file" id="fileInput" accept="image/*" class="hidden">
+            <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                Upload Image
+            </button>
+            <button class="crop-btn" id="cropBtn" onclick="startCropping()" disabled>
+                Start Cropping
+            </button>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="imageCanvas"></canvas>
+        </div>
+
+        <div class="result-container">
+            <h3>Cropped Result</h3>
+            <img id="croppedResult" class="cropped-image hidden" alt="Cropped image">
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('imageCanvas');
+        const ctx = canvas.getContext('2d');
+        const fileInput = document.getElementById('fileInput');
+        const cropBtn = document.getElementById('cropBtn');
+        const croppedResult = document.getElementById('croppedResult');
+
+        let originalImage = null;
+        let isDrawing = false;
+        let cropMode = false;
+        let startX = 0;
+        let startY = 0;
+        let imageData = {
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0
+        };
+
+        // Set canvas size
+        canvas.width = 600;
+        canvas.height = 400;
+
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    originalImage = new Image();
+                    originalImage.onload = function() {
+                        // Reset canvas and drawing
+                        cropMode = false;
+                        isDrawing = false;
+                        cropBtn.disabled = false;
+                        croppedResult.classList.add('hidden');
+                        
+                        // Draw image maintaining aspect ratio
+                        drawImageScaled(originalImage);
+                    };
+                    originalImage.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function drawImageScaled(img) {
+            const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+            const x = (canvas.width - img.width * scale) / 2;
+            const y = (canvas.height - img.height * scale) / 2;
+            
+            // Store the image dimensions and position
+            imageData = {
+                x: x,
+                y: y,
+                width: img.width * scale,
+                height: img.height * scale,
+                scale: scale
+            };
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+        }
+
+        function startCropping() {
+            cropMode = true;
+            drawImageScaled(originalImage);
+        }
+
+        canvas.addEventListener('mousedown', function(e) {
+            if (!cropMode) return;
+            
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            
+            startX = (e.clientX - rect.left) * scaleX;
+            startY = (e.clientY - rect.top) * scaleY;
+        });
+
+        canvas.addEventListener('mousemove', function(e) {
+            if (!isDrawing || !cropMode) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const currentX = (e.clientX - rect.left) * scaleX;
+            const currentY = (e.clientY - rect.top) * scaleY;
+
+            // Redraw original image
+            drawImageScaled(originalImage);
+
+            // Draw semi-transparent overlay
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Calculate crop rectangle
+            const cropX = Math.min(startX, currentX);
+            const cropY = Math.min(startY, currentY);
+            const cropWidth = Math.abs(currentX - startX);
+            const cropHeight = Math.abs(currentY - startY);
+
+            // Clear crop area and draw border
+            ctx.clearRect(cropX, cropY, cropWidth, cropHeight);
+            ctx.strokeStyle = 'white';
+            ctx.strokeRect(cropX, cropY, cropWidth, cropHeight);
+        });
+
+        canvas.addEventListener('mouseup', function(e) {
+            if (!isDrawing || !cropMode) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const currentX = (e.clientX - rect.left) * scaleX;
+            const currentY = (e.clientY - rect.top) * scaleY;
+
+            // Calculate final crop coordinates
+            const cropX = Math.min(startX, currentX);
+            const cropY = Math.min(startY, currentY);
+            const cropWidth = Math.abs(currentX - startX);
+            const cropHeight = Math.abs(currentY - startY);
+
+            if (cropWidth > 0 && cropHeight > 0) {
+                performCrop(cropX, cropY, cropWidth, cropHeight);
+            }
+
+            isDrawing = false;
+        });
+
+        function performCrop(cropX, cropY, cropWidth, cropHeight) {
+            // Create temporary canvas for cropped image
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = cropWidth;
+            tempCanvas.height = cropHeight;
+            const tempCtx = tempCanvas.getContext('2d');
+
+            // Calculate the relative position in the original image
+            const sourceX = (cropX - imageData.x) / imageData.scale;
+            const sourceY = (cropY - imageData.y) / imageData.scale;
+            const sourceWidth = cropWidth / imageData.scale;
+            const sourceHeight = cropHeight / imageData.scale;
+
+            // Draw the cropped portion
+            tempCtx.drawImage(
+                originalImage,
+                sourceX, sourceY,
+                sourceWidth, sourceHeight,
+                0, 0,
+                cropWidth, cropHeight
+            );
+
+            // Display cropped result
+            croppedResult.src = tempCanvas.toDataURL();
+            croppedResult.classList.remove('hidden');
+
+            // Reset crop mode and redraw original
+            cropMode = false;
+            drawImageScaled(originalImage);
+        }
+    </script>
+</body>
+</html>

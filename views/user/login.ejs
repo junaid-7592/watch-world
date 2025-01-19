@@ -413,24 +413,49 @@
 									<p>If you have an account with us, please log in.</p>
 								</div>
 								<div class="account-form">
-									<form class="form-horizontal product-form" action="#">
-										<div class="form-goroup">
+
+
+
+
+									<form class="form-horizontal product-form" action="/login" method="post">
+										<div class="form-group">
 											<label>Email Address <sup>*</sup></label>
-											<input type="text" required="required" class="form-control">
+											<input type="text" name="email" required="required" class="form-control">
 										</div>
-										<div class="form-goroup">
+										<div class="form-group">
 											<label>Password <sup>*</sup></label>
-											<input type="password" required="required" class="form-control">
+											<input type="password" name="password" required="required" class="form-control">
+											<!-- <p style="color: rgb(243, 58, 58);" ><%= message %><p></p> -->
+
+										</div>
+										 <%if(locals.message&& message.length>0){%>
+                                           <div class="alert alert-danger text-center">
+                                             <%=message%>
+										   </div>
+										<%}%>
+										 
+
+								
+
+
+
+										<div class="user-bottom fix">
+											<div class="user-bottom-inner">
+												<a href="/forgot-password">Forgot Your Password?</a>
+												<button class="btn custom-button" type="submit">Login</button>
+											</div>
 										</div>
 									</form>
+									
+
+
+
+
+							
 								</div>
 								<p class="reauired-fields floatright"><sup>*</sup> Required Fields</p>
 							</div>
-							<div class="user-bottom fix">
-								<div class="user-bottom-inner">
-									<a href="#">Forgot Your Password?</a>
-									<button class="btn custom-button" type="button">login</button>
-								</div>
+							
 							</div>
 						</div>
 					</div>

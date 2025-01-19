@@ -169,7 +169,7 @@
             <button type="submit" class="btn btn-primary">Verify Email</button>
             <div class="form-group text-center">
                 <div id="otpTimer" class="otp-timer">
-                    <span id="timerValue">10</span>
+                    <span id="timerValue">30</span>
                 </div>
                 <button id="resend-btn" type="button" class="btn btn-secondary resend-btn" onclick="resendOTP()">Resend
                     OTP</button>
@@ -186,9 +186,9 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         // Make timer variables global
-        let timer = 30; // Initial timer value
+        let timer = 60; // Initial timer value
         let timerInterval;
-        let time = 10; // Default time for resend OTP
+        let time = 60; // Default time for resend OTP
 
         document.getElementById("otp").focus();
 
@@ -256,7 +256,7 @@
         }
 
         function resendOTP() {
-            console.log('Resending OTP...');
+            console.log('Resending OTP...');  //frendentil console cheyyikkan de bug n  user kanoola
 
             // Reset timer before starting
             clearInterval(timerInterval); // Clear existing interval
@@ -302,4 +302,4 @@
     </script>
 </body>
 
-</html>           
+</html>                
