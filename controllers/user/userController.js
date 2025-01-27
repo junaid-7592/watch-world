@@ -7,7 +7,7 @@ app.use(express.json()); // J
 app.use(express.urlencoded({ extended: true })); 
 
 const User=require("../../models/userSchema")
-const Category=require("../../models/category");
+const Category=require("../../models/category");   //or categorySchema
 const product=require("../../models/productSchema");
 
 const env=require("dotenv").config();
@@ -117,27 +117,25 @@ const securePassword=async (password)=>{
 
 const loadHomepage=async(req,res)=>{
     try{
-        const user=req.session.user;
-        // const categories=await Category.find({isListed:true});
-        // let productData=await product.find({
-            // isBlocked:false,
-            // category:{$in:categories.map(category=>category._id)},quantity:{$gt:0}
-        // })
+        const  user=req.session.user;
+        const categories=await Category.find({isListed:true}); 
+        let productData=await product.find(
+          
+            {isBlocked:false,
+                category:{$in:categories.map(category=>category._id)},quantity:{$gt:0}
+            }
+        )
 
-    //   productData.sort((a,b)=>new Date(b.createdOn)-new Date(a.createdOn));
-    //   productData=productData.slice(0,4);
-        const categories=await Category.find({isListed:true});
-        let productData=await product.find({
-            isBlocked:false,
-            category:{$in:categories.map(category=>category._id)},quantity:{$gt:0}
-        })
+        // productData.sort((a,b)=>new Date(b.createdOn)-new Date(a.createdOn));
+        productData =productData.slice(0)    
+    
         // console.log(productData)clear
-        
+           
 
-
+        const message = req.message || null;
         if(user){
          const userData=await User.findOne({_id:user._id}) ;
-         res.render("home",{user:userData, products:productData})  
+         res.render("home",{user:userData, products:productData , message : message})  
         }else{
             return res.render("home",{products:productData});
         }
@@ -293,20 +291,40 @@ const resendOtp=async(req,res)=>{
     }
 }
 
-const shopget= async(req,res)=>{
-    
-       
+const shopget = async (req, res) => {
     try {
-        const categories=await Category.find({isListed:true});
-        let productData=await product.find({
-            isBlocked:false,
-            category:{$in:categories.map(category=>category._id)},quantity:{$gt:0}
-        })   
-        return res.render("shop",{product:productData})
+        const page = parseInt(req.query.page) || 1;
+        const limit = 8;
+        const skip = (page - 1) * limit;
+        
+        const categories = await Category.find({ isListed: true });
+        
+        const totalProducts = await product.countDocuments({
+            isBlocked: false,
+            category: { $in: categories.map(category => category._id) },
+            quantity: { $gt: 0 }
+        });
+        
+        const totalPages = Math.ceil(totalProducts / limit);
+        
+        const productData = await product.find({
+            isBlocked: false,
+            category: { $in: categories.map(category => category._id) },
+            quantity: { $gt: 0 }
+        })
+        .skip(skip)
+        .limit(limit);
+
+        return res.render("shop", { 
+            product: productData,
+            currentPage: page,
+            totalPages: totalPages
+        });
     } catch (error) {
-        console.log(`eroor ocur on the ${error}`)
-    }              
-}
+        console.error(`Error occurred: ${error}`);
+        return res.status(500).render("error", { message: "An error occurred while fetching products" });
+    }
+};
                             
 
          

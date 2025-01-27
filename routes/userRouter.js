@@ -2,6 +2,10 @@ const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/user/userController");
 const passport = require("passport");
+const profileController=require("../controllers/user/profileController")
+const productController = require('../controllers/user/productCondroller')
+const auth = require('../middlewares/auth')
+// const {adminAuth,userAuth}=require("../middlewares/auth")
 
 
 router.get("/pageNotFound", userController.pageNotFound);
@@ -20,6 +24,9 @@ router.post("/verify-otp", userController.verifyOtp);
 router.post("/resend-otp", userController.resendOtp);
 
 router.get("/auth/google", passport.authenticate('google', { scope: ['profile', 'email'] }));  //name email  nn edukkunnu
+// router.get("/auth/google/callback", passport.authenticate('google', {failureRedirect: '/signup'}), async (req, res) => {
+//     res.redirect('/')
+// })
 // router.get('/auth/google/callback', 
 //     passport.authenticate('google', { failureRedirect: '/signup' }),
 //     (req, res) => {
@@ -32,13 +39,17 @@ router.get("/auth/google", passport.authenticate('google', { scope: ['profile', 
 //       res.redirect('/')
 //     }
 //   );
-router.get(
-    '/auth/google/callback',
+router.get('/auth/google/callback',
     (req, res, next) => {
+        console.log("from google auth");
+        
         passport.authenticate('google', (err, user, info) => {
+            console.log("1");
+            
             if (err || !user) {
                 // Render the signup page with the error message
                 const errorMessage = info?.message || "An error occurred during authentication";
+            console.log(user,err);
                 return res.redirect('/signup');
             }
 
@@ -58,7 +69,34 @@ router.get(
 );
 
 router.get("/shop",userController.shopget)
+//profile manegment
+
+router.get("/forgot-password",profileController.getForgotPassPage)
+router.post("/forgot-email-valid",profileController.forgotEmailValid)
+router.post("/VerifyOtp-changepassword",profileController.verifyOtpChangePasswordPage)
+
+
+
+
+
+router.get("/productinfo",productController.productDetails)
+
+
+// router.get("/userprofile",userAuth,profileController.userProfile);
+router.get("/profile",auth.userAuth,profileController.userProfile)
+
+
+router.get("/change-password",auth.userAuth,profileController.changePassword)
+router.post("/change-password",auth.userAuth,profileController.changePasswordValid)
+
+router.post("/passwordResendOtp",auth.userAuth,profileController.passwordResendOtp)
+
+
+router.post("/conformation-forgotpass",auth.userAuth,profileController.coformationForgotpassword)
+
+
+
 
 
                                                          
-module.exports = router;                      
+module.exports = router;                                     

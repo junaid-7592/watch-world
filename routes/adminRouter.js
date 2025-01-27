@@ -1,7 +1,7 @@
 const express=require("express");
 const router=express.Router();
 const adminController=require("../controllers/admin/adminController");
-const{userAuth,adminAuth}=require("../middlewares/autyh");
+const{userAuth,adminAuth}=require("../middlewares/auth");
 const customerController=require("../controllers/admin/customerController")
 const categoryController=require("../controllers/admin/categoryController")
 const productController=require("../controllers/admin/productController");
@@ -34,7 +34,7 @@ router.get("/unblockProduct",adminAuth,productController.unblockProduct)
 router.get("/editProduct/:id",adminAuth,productController.getEditProduct)
 router.post("/editProduct/:id",adminAuth,productController.editProduct)
 router.post("/deleteImage",adminAuth,productController.deleteSingleImage)
-
+router.post('/croppedImage/:productId', upload.single("image"),productController.croppedImage)
 
 
 //product Manegment

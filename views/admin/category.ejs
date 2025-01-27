@@ -90,7 +90,11 @@
         <div class="card-body">
           <div class="row">
             <div class="col-md-3">
+
               <form method="post" action="/admin/addCategory" onsubmit="return  handleFormSubmit(event)">
+                
+
+
                 <div class="mb-4">
                   <label for="product_name" class="form-label">Name</label>
                   <input type="text" name="name" placeholder="Type here" class="form-control" id="name" />
@@ -105,11 +109,11 @@
 
 
 
-                <div class="mb-4">
+                <!-- <div class="mb-4">
                   <label class="form-label">image</label><br>
                   <input type="file" id="image" name="image">
                   <div id="description-error" class="error-message"></div>
-                </div>
+                </div> -->
 
 
 
@@ -128,7 +132,7 @@
                       <th class="text-center"></th>
                       <th>Name</th>
                       <th>Description</th>
-                      <th>Offer Price</th>
+                      <th></th>
                       <th>Offer</th>
                       <th>Status</th>
                       <th>List/Unlist</th>
@@ -154,10 +158,10 @@
                             style="width: 100px;background-color: #088178; border: none; border-radius: 6PX; padding: 5PX;">
                             <a style="color: #ffff;" href="#" class="text-white"><b>Add Offer</b></a>
                           </button>
-                          <button class="btn btn-info"
+                          <!-- <button class="btn btn-info"
                             style="width: 100px ; background-color: #b0d5de; border: none; border-radius: 6PX; padding: 5PX">
                             <a style="color: #000000;" href="#" class="text-white"><b>Remove</b></a>
-                          </button>
+                          </button> -->
                         </td>
                         <td class="text-start">
 
@@ -205,23 +209,21 @@
       </div>
 
       <div class="pagination-container">
-        <% if (currentPage> 1) { %>
+        <% if (currentPage > 1) { %>
           <a href="?page=<%= currentPage - 1 %>">&laquo; Previous</a>
+        <% } %>
+        
+        <% for (let i = 1; i <= totalPages; i++) { %>
+          <% if (i === currentPage) { %>
+            <span class="current-page"><%= i %></span>
+          <% } else { %>
+            <a href="?page=<%= i %>"><%= i %></a>
           <% } %>
-            <% for (let i=1; i <=totalPages; i++) { %>
-              <% if (i===currentPage) { %>
-                <span class="current-page">
-                  <%= i %>
-                </span>
-                <% } else { %>
-                  <a href="?page=<%= i %>">
-                    <%= i %>
-                  </a>
-                  <% } %>
-                    <% } %>
-                      <% if (currentPage < totalPages) { %>
-                        <a href="?page=<%= currentPage + 1 %>">Next &raquo;</a>
-                        <% } %>
+        <% } %>
+        
+        <% if (currentPage < totalPages) { %>
+          <a href="?page=<%= currentPage + 1 %>">Next &raquo;</a>
+        <% } %>
       </div>
 
 
@@ -238,11 +240,16 @@
         if (!validateForm()) {
           return
         }
+
+
+
         const name = document.getElementById("name").value.trim()
         const description = document.getElementById("descriptionId").value.trim()
-         const image = document.getElementById("image")
+        //  const image = document.getElementById("image")
+
          const formData=new FormData()
-         formData.append("image", image.files[0]);
+
+        //  formData.append("image", image.files[0]);
          formData.append("name",name)
          formData.append("description",description)
 
@@ -271,7 +278,7 @@
           .catch(error => {
             Swal.fire({
               icon: 'error',
-              title: "Oops",
+              title: "Oops....",
               text: error.message // Show error message from the backend or generic error
             });
           });

@@ -72,6 +72,49 @@
         tbody tr:hover {
             background-color: #f9f9f9;
         }
+        .pagination-custom {
+            display: flex;
+            justify-content: center;
+            padding: 0;
+            list-style: none;
+            margin-right: 200px;
+        }
+
+        .pagination-custom .page-item {
+            margin: 0 5px;
+        }
+
+        .pagination-custom .page-link {
+            display: inline-block;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-decoration: none;
+            color: #007bff;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Hover effect */
+        .pagination-custom .page-link:hover {
+            background-color: #f1f1f1;
+            color: #0056b3;
+        }
+
+        /* Active page styling */
+        .pagination-custom .page-item.active .page-link {
+            background-color: #007bff;
+            color: #fff;
+            border-color: #007bff;
+            pointer-events: none;
+        }
+
+        /* Optional: Styling for disabled pages */
+        .pagination-custom .page-item.disabled .page-link {
+            color: #6c757d;
+            pointer-events: none;
+            background-color: #e9ecef;
+            border-color: #dee2e6;
+        }
     </style>
 </head>
 <div class="content-header">
@@ -145,27 +188,18 @@
 </div>
 
 <div class="container mt-3">
-
     <div class="container mt-3">
         <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-center mb-20" style="margin-right: 200px;">
-     
-     
+            <ul class="pagination-custom">
                 <% for (let i = 1; i <= totalPages; i++) { %>
-                <li class="page-item <%=(i === currentPage) ? 'active' : '' %>">
-                    <a class="page-link" href="?page=<%= i %>"><%= i %></a>
-                </li>
+                    <li class="page-item <%= currentPage == i ? 'active' : '' %>">
+                        <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                    </li>
                 <% } %>
-     
-     
             </ul>
         </nav>
-     </div>
-     
-     
-
+    </div>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <%- include("../../views/partials/admin/footer") %>

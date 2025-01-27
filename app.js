@@ -8,12 +8,15 @@ const db = require("./config/db");
 const userRouter = require("./routes/userRouter");
 const adminRouter=require("./routes/adminRouter");
 const userlog = require("./middlewares/userlogin");
+const flash = require('connect-flash');
+
 
 
 db();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 app.use(session({
   secret:process.env.SESSION_SECRET,
   resave:false,
@@ -24,6 +27,12 @@ app.use(session({
     maxAge:72*60*60*1000
   }
 }))
+
+
+// const flash = require('connect-flash');
+app.use(flash());
+
+
 
 //passport initialise
 app.use(passport.initialize())

@@ -173,7 +173,7 @@
         <div class="col-lg-6">
             <div class="card mb-4">
                 <div class="card-body">
-                    <form method="post" action="/admin/addProducts" enctype="multipart/form-data" id="productForm" onsubmit="return validateForm()">
+                    <form enctype="multipart/form-data" id="productForm">
                         <!-- Product Name -->
                         <div class="mb-4">
                             <label for="product_name" class="form-label">Product Name</label>
@@ -271,7 +271,7 @@
 
                                                     <div class="btn-crop-controls">
                                                         <button type="button" class="btn btn-primary" id="saveButton<%= i %>">Save Crop</button>
-                                                        <button type="button" class="btn btn-secondary">Cancel</button>
+                                                        <!-- <button type="button" class="btn btn-secondary" onclick="window.history.back()">Cancel</button> -->
                                                     </div>
                                                 </div>
                                             </div>
@@ -296,11 +296,42 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script> -->
 <script src="https://unpkg.com/cropperjs@1.5.12/dist/cropper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
 <script>
-   function validateAndSubmit(){
-    if(validateForm()){
-       document.forms[0].submit(); 
+   async function validateAndSubmit(event){
+    try {
+        event.preventDefault()
+        if(!validateForm()){
+            return;
+        }
+        const form = document.getElementById('productForm')
+        const formData = new FormData(form)
+        const response = await fetch('/admin/addProducts', {
+            method: 'POST',
+            body:formData
+        })
+        const data = await response.json()
+        if(!response.ok) {
+            throw new Error(data.message);
+
+        }
+        if(data.success) {
+                Swal.fire({
+                title: 'Success!',
+                text: 'added seccessfully.',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
+        }
+    } catch (error) {
+        Swal.fire({
+            title: 'Oops!',
+            text: error.message,
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
     }
    }  
    document.getElementById('submit-button').addEventListener('click',validateAndSubmit)

@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Previous head content remains the same -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luxury Watch - Product Detail</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        
+        /* Previous styles remain the same */
+        /* .magnifier-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+        } */
+
+        /* .main-image {
+            width: 100%;
+            height: auto;
+            cursor: zoom-in;
+        } */
+
+        /* .magnifier-lens {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            pointer-events: none;
+            display: none;
+            background-repeat: no-repeat;
+            z-index: 1000;
+        } */
+        .magnifier-lens {
+    position: absolute;
+    border: 1px solid #000;
+    border-radius: 50%;
+    cursor: crosshair;
+    box-shadow: 0 0 5px #000;
+    pointer-events: none;
+    visibility: hidden;
+    background-repeat: no-repeat;
+}
+
+.main-image-cont {
+    position: relative;
+    display: inline-block;
+}
+
+.main-img {
+    display: block;
+    max-width: 100%;
+}
+
+        .product-thumbnails {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .thumbnail {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        .thumbnail:hover,
+        .thumbnail.active {
+            border-color: #0d6efd;
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .price {
+            font-size: 2rem;
+            color: #0d6efd;
+            font-weight: bold;
+        }
+
+        .stock-status {
+            color: #198754;
+            font-weight: 500;
+        }
+
+        .features-list li {
+            margin-bottom: 10px;
+        }
+
+        /* New quantity selector styles */
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            max-width: 150px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .quantity-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background-color: #f8f9fa;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .quantity-btn:hover {
+            background-color: #e9ecef;
+        }
+
+        .quantity-input {
+            width: 60px;
+            height: 40px;
+            border: none;
+            border-left: 1px solid #dee2e6;
+            border-right: 1px solid #dee2e6;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .quantity-input:focus {
+            outline: none;
+        }
+
+        /* Remove spinner buttons from number input */
+        .quantity-input::-webkit-inner-spin-button,
+        .quantity-input::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .review-card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .reviewer-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .reviewer-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #6c757d;
+        }
+
+        .star-rating {
+            color: #ffc107;
+        }
+
+        .verified-badge {
+            background-color: #198754;
+            color: white;
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-left: 10px;
+        }
+
+        .review-date {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .overall-rating {
+            text-align: center;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .rating-breakdown {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+
+        .rating-bar {
+            flex-grow: 1;
+            height: 8px;
+            background-color: #dee2e6;
+            margin: 0 10px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .rating-fill {
+            height: 100%;
+            background-color: #ffc107;
+        }
+
+        .helpful-btn {
+            border: 1px solid #dee2e6;
+            padding: 5px 15px;
+            border-radius: 15px;
+            background-color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .helpful-btn:hover {
+            background-color: #f8f9fa;
+        }
+
+        .helpful-btn.active {
+            background-color: #e9ecef;
+            border-color: #6c757d;
+        }
+        .main-image {
+    width: 100%; /* Ensure it fits the container */
+    height: 100%; /* Optional, maintains aspect ratio */
+    object-fit: cover; /* Ensures the image scales properly inside its container */
+    transition: transform 0.4s ease; /* Smooth transition */
+}
+
+.main-image:hover {
+    transform: scale(2); /* Fully zoom the image */
+}
+
+
+    </style>
+</head>
+<body>
+    <%-include ("../../views/partials/user/header") %>
+    <div class="container py-5">
+
+        <div class="breadcurb-area">
+			<div class="container">
+				<ul class="breadcrumb">
+					<li class="home"><a href="/">Home/</a></li>
+
+					<li><a>Product Info</a></li>
+				</ul>
+			</div>
+		</div>
+
+        <div class="row">
+            <!-- Previous content remains the same until quantity selector -->
+            <div class="col-md-6">
+                <div class="main-image-cont">
+                    <img class="main-img" src="<%= product.productImage[0] %>" id="main-image" alt="Luxury Watch" class="main-image">
+                    <!-- <div class="magnifier-lens"></div> -->
+                </div>
+                <div class="product-thumbnails">
+                    <img src="<%= product.productImage[0] %>" alt="Watch Thumbnail 1" class="thumbnail active">
+                    <img src="<%= product.productImage[1] %>" alt="Watch Thumbnail 2" class="thumbnail">
+                    <img src="<%= product.productImage[2] %>" alt="Watch Thumbnail 3" class="thumbnail">
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="product-info">
+                    <h1 class="mb-3"> <%=product.productName %></h1>
+                    <p class="price mb-3">₹<%=product.salePrice %></p>
+                    <% if (product.quantity>0){ %>
+                    <p class="stock-status mb-4">✓ In Stock</p>
+                    <%}else{%>
+                        <p class="stock-status mb-4"> out of Stock</p>
+                         <%}%>
+
+                         <div class="mb-4">
+                            <h4>Quantity</h4>
+                            <p><%=product.quantity%></p>
+                        </div>
+
+                    <div class="mb-4">
+                        <h5>Description</h5>
+                        <p><%=product.description%></p>
+                    </div>
+
+
+                    <!-- <div class="mb-4">
+                        <h5>Key Features</h5>
+                        <ul class="features-list">
+                            <li>Swiss automatic movement</li>
+                            <li>Sapphire crystal glass</li>
+                            <li>Water-resistant up to 100m</li>
+                            <li>Premium stainless steel case</li>
+                            <li>Genuine leather strap</li>
+                        </ul>
+                    </div> -->
+
+                    <!-- Updated quantity selector -->
+                    <div class="mb-4">
+                        <label class="form-label">Quantity</label>
+                        <div class="quantity-selector">
+                            <button class="quantity-btn" id="decreaseBtn">-</button>
+                            <input type="number" class="quantity-input" id="quantity" value="1" min="1" max="5">
+                            <button class="quantity-btn" id="increaseBtn">+</button>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary btn-lg mb-3 w-100">Add to Cart</button>
+                    <button class="btn btn-outline-primary btn-lg w-100">Add to Wishlist</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container py-5">
+        <h2 class="mb-4">Customer Reviews</h2>
+        
+        <!-- Overall Rating Summary -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="overall-rating">
+                    <h1 class="mb-2">4.8</h1>
+                    <div class="star-rating mb-2">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <p class="text-muted mb-0">Based on 247 reviews</p>
+                </div>
+            </div>
+            
+            <div class="col-md-8">
+                <div class="rating-breakdown-container">
+                    <div class="rating-breakdown">
+                        <span>5 stars</span>
+                        <div class="rating-bar">
+                            <div class="rating-fill" style="width: 75%"></div>
+                        </div>
+                        <span>75%</span>
+                    </div>
+                    <div class="rating-breakdown">
+                        <span>4 stars</span>
+                        <div class="rating-bar">
+                            <div class="rating-fill" style="width: 15%"></div>
+                        </div>
+                        <span>15%</span>
+                    </div>
+                    <div class="rating-breakdown">
+                        <span>3 stars</span>
+                        <div class="rating-bar">
+                            <div class="rating-fill" style="width: 7%"></div>
+                        </div>
+                        <span>7%</span>
+                    </div>
+                    <div class="rating-breakdown">
+                        <span>2 stars</span>
+                        <div class="rating-bar">
+                            <div class="rating-fill" style="width: 2%"></div>
+                        </div>
+                        <span>2%</span>
+                    </div>
+                    <div class="rating-breakdown">
+                        <span>1 star</span>
+                        <div class="rating-bar">
+                            <div class="rating-fill" style="width: 1%"></div>
+                        </div>
+                        <span>1%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Individual Reviews -->
+        <div class="reviews-container">
+            <!-- Review 1 -->
+            <div class="review-card">
+                <div class="review-header">
+                    <div class="reviewer-info">
+                        <div class="reviewer-avatar">JD</div>
+                        <div>
+                            <h6 class="mb-0">John Doe <span class="verified-badge">Verified Purchase</span></h6>
+                            <div class="star-rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="review-date">January 15, 2025</span>
+                </div>
+                <h5>Exceptional Quality and Design</h5>
+                <p>This watch exceeded my expectations in every way. The build quality is outstanding, and the attention to detail is remarkable. The chronograph functions work flawlessly, and the leather strap is incredibly comfortable.</p>
+                <div class="review-footer mt-3">
+                    <button class="helpful-btn" onclick="this.classList.toggle('active')">
+                        <i class="far fa-thumbs-up"></i> Helpful (24)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Review 2 -->
+            <div class="review-card">
+                <div class="review-header">
+                    <div class="reviewer-info">
+                        <div class="reviewer-avatar">MS</div>
+                        <div>
+                            <h6 class="mb-0">Maria Smith <span class="verified-badge">Verified Purchase</span></h6>
+                            <div class="star-rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="review-date">January 12, 2025</span>
+                </div>
+                <h5>Beautiful Watch, Minor Issues</h5>
+                <p>The watch looks stunning and keeps perfect time. The only reason for 4 stars is that the leather strap needed some breaking in during the first week. Now it's perfectly comfortable. The customer service was excellent when I had questions about the adjustment.</p>
+                <div class="review-footer mt-3">
+                    <button class="helpful-btn" onclick="this.classList.toggle('active')">
+                        <i class="far fa-thumbs-up"></i> Helpful (18)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Review 3 -->
+            <div class="review-card">
+                <div class="review-header">
+                    <div class="reviewer-info">
+                        <div class="reviewer-avatar">RJ</div>
+                        <div>
+                            <h6 class="mb-0">Robert Johnson <span class="verified-badge">Verified Purchase</span></h6>
+                            <div class="star-rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="review-date">January 8, 2025</span>
+                </div>
+                <h5>Perfect Investment Piece</h5>
+                <p>I've been collecting watches for years, and this piece stands out in my collection. The Swiss movement is butter-smooth, and the sapphire crystal is incredibly clear. The water resistance has been tested during swimming, and it performed perfectly.</p>
+                <div class="review-footer mt-3">
+                    <button class="helpful-btn" onclick="this.classList.toggle('active')">
+                        <i class="far fa-thumbs-up"></i> Helpful (31)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Load More Reviews Button -->
+        <div class="text-center mt-4">
+            <button class="btn btn-outline-primary">Load More Reviews</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+       document.addEventListener('DOMContentLoaded', function () {
+    const mainImage = document.querySelector('.main-img');
+    const thumbnails = document.querySelectorAll('.thumbnail');
+
+    // Thumbnail functionality
+    thumbnails.forEach(thumbnail => {
+        thumbnail.addEventListener('click', () => {
+            mainImage.src = thumbnail.src; // Change main image
+            thumbnails.forEach(t => t.classList.remove('active')); // Remove active class
+            thumbnail.classList.add('active'); // Add active class to selected thumbnail
+        });
+    });
+
+    // Quantity selector functionality
+    const quantityInput = document.getElementById('quantity');
+    const decreaseBtn = document.getElementById('decreaseBtn');
+    const increaseBtn = document.getElementById('increaseBtn');
+
+    function updateQuantity(value) {
+        let newValue = parseInt(quantityInput.value) + value;
+        newValue = Math.min(Math.max(newValue, 1), 5); // Limit between 1 and 5
+        quantityInput.value = newValue;
+    }
+
+    decreaseBtn.addEventListener('click', () => updateQuantity(-1));
+    increaseBtn.addEventListener('click', () => updateQuantity(1));
+
+    // Ensure manual input stays within bounds
+    quantityInput.addEventListener('change', () => {
+        let value = parseInt(quantityInput.value);
+        if (isNaN(value)) value = 1;
+        value = Math.min(Math.max(value, 1), 5);
+        quantityInput.value = value;
+    });
+});
+
+
+// Create the Magnifier Lens for zooming product---
+var magnifierLens = document.createElement('div');
+        magnifierLens.classList.add('magnifier-lens');
+        document.body.appendChild(magnifierLens); // Append it to the body or a specific container
+
+        function setupMagnifier(imageElement) {
+            var magnificationFactor = 3; // Adjust magnification level as needed
+            var magnifierSize = 200; // Starting size of the magnifier lens
+
+            // Ensure the magnifier lens is styled and prepared
+            magnifierLens.style.backgroundRepeat = 'no-repeat';
+            magnifierLens.style.pointerEvents = 'none';
+            magnifierLens.style.position = 'absolute';
+            magnifierLens.style.border = '1px solid #000';
+            magnifierLens.style.borderRadius = '50%';
+            magnifierLens.style.width = magnifierSize + 'px'; // Diameter of the lens
+            magnifierLens.style.height = magnifierSize + 'px'; // Diameter of the lens
+            magnifierLens.style.visibility = 'hidden'; // Initially hidden
+            magnifierLens.style.boxShadow = '0 0 5px #000';
+            magnifierLens.style.cursor = 'crosshair';
+
+            // Function to update magnifier lens size
+            function updateMagnifierSize(deltaY) {
+                // Update magnifier size
+                magnifierSize += deltaY > 0 ? -20 : 20;
+                magnifierSize = Math.max(100, Math.min(magnifierSize, 400));
+
+                // Adjust magnification factor based on lens size
+                magnificationFactor = 2 + (magnifierSize - 100) * (5 - 2) / (400 - 100);
+
+                magnifierLens.style.width = magnifierSize + 'px';
+                magnifierLens.style.height = magnifierSize + 'px';
+
+                // Update lens styling for new magnification
+                updateLensMagnification();
+            }
+
+            function updateLensMagnification() {
+                if (!imageElement) return; // Ensure there's an image element to work on
+
+                var bounds = imageElement.getBoundingClientRect();
+                var bgPosX = -(magnifierLens.offsetLeft - bounds.left) * magnificationFactor - magnifierLens.offsetWidth / 2;
+                var bgPosY = -(magnifierLens.offsetTop - bounds.top) * magnificationFactor - magnifierLens.offsetHeight / 2;
+
+                magnifierLens.style.backgroundSize = `${imageElement.width * magnificationFactor}px ${imageElement.height * magnificationFactor}px;
+                magnifierLens.style.backgroundPosition = ${bgPosX}px ${bgPosY}px`;
+
+                // Trigger reflow
+                magnifierLens.offsetHeight;
+            }
+
+            imageElement.addEventListener('mousemove', function (e) {
+                magnifierLens.style.visibility = 'visible';
+                var bounds = e.target.getBoundingClientRect();
+                var mouseX = e.clientX - bounds.left;
+                var mouseY = e.clientY - bounds.top;
+
+                var lensX = mouseX - (magnifierLens.offsetWidth / 2);
+                var lensY = mouseY - (magnifierLens.offsetHeight / 2);
+
+                magnifierLens.style.left = (bounds.left + window.pageXOffset + lensX) + 'px';
+                magnifierLens.style.top = (bounds.top + window.pageYOffset + lensY) + 'px';
+
+                var bgPosX = -((mouseX * magnificationFactor) - magnifierLens.offsetWidth / 2);
+                var bgPosY = -((mouseY * magnificationFactor) - magnifierLens.offsetHeight / 2);
+
+                magnifierLens.style.backgroundImage = url('${imageElement.src}');
+                magnifierLens.style.backgroundSize = `${imageElement.width * magnificationFactor}px ${imageElement.height * magnificationFactor}px;
+                magnifierLens.style.backgroundPosition = ${bgPosX}px ${bgPosY}px`;
+
+                imageElement.style.cursor = 'none'; // Hide the cursor when magnifier is active
+            });
+
+            imageElement.addEventListener('wheel', function (e) {
+                e.preventDefault(); // Prevent the page from scrolling
+                updateMagnifierSize(e.deltaY); // Adjust the magnifier size based on scroll direction
+            }, { passive: false });
+
+            imageElement.addEventListener('mouseleave', function () {
+                magnifierLens.style.visibility = 'hidden';
+                imageElement.style.cursor = 'default'; // Reset the cursor when the mouse leaves
+            });
+        }
+// Create the Magnifier Lens for zooming product---
+        var magnifierLens = document.createElement('div');
+        magnifierLens.classList.add('magnifier-lens');
+        document.body.appendChild(magnifierLens); // Append it to the body or a specific container
+
+        function setupMagnifier(imageElement) {
+            var magnificationFactor = 3; // Adjust magnification level as needed
+            var magnifierSize = 200; // Starting size of the magnifier lens
+
+            // Ensure the magnifier lens is styled and prepared
+            magnifierLens.style.backgroundRepeat = 'no-repeat';
+            magnifierLens.style.pointerEvents = 'none';
+            magnifierLens.style.position = 'absolute';
+            magnifierLens.style.border = '1px solid #000';
+            magnifierLens.style.borderRadius = '50%';
+            magnifierLens.style.width = magnifierSize + 'px'; // Diameter of the lens
+            magnifierLens.style.height = magnifierSize + 'px'; // Diameter of the lens
+            magnifierLens.style.visibility = 'hidden'; // Initially hidden
+            magnifierLens.style.boxShadow = '0 0 5px #000';
+            magnifierLens.style.cursor = 'crosshair';
+
+            // Function to update magnifier lens size
+            function updateMagnifierSize(deltaY) {
+                // Update magnifier size
+                magnifierSize += deltaY > 0 ? -20 : 20;
+                magnifierSize = Math.max(100, Math.min(magnifierSize, 400));
+
+                // Adjust magnification factor based on lens size
+                magnificationFactor = 2 + (magnifierSize - 100) * (5 - 2) / (400 - 100);
+
+                magnifierLens.style.width = magnifierSize + 'px';
+                magnifierLens.style.height = magnifierSize + 'px';
+
+                // Update lens styling for new magnification
+                updateLensMagnification();
+            }
+
+            function updateLensMagnification() {
+                if (!imageElement) return; // Ensure there's an image element to work on
+
+                var bounds = imageElement.getBoundingClientRect();
+                var bgPosX = -(magnifierLens.offsetLeft - bounds.left) * magnificationFactor - magnifierLens.offsetWidth / 2;
+                var bgPosY = -(magnifierLens.offsetTop - bounds.top) * magnificationFactor - magnifierLens.offsetHeight / 2;
+
+                magnifierLens.style.backgroundSize = `${imageElement.width * magnificationFactor}px ${imageElement.height * magnificationFactor}px`;
+                magnifierLens.style.backgroundPosition = `${bgPosX}px ${bgPosY}px`;
+
+                // Trigger reflow
+                magnifierLens.offsetHeight;
+            }
+
+            imageElement.addEventListener('mousemove', function (e) {
+                magnifierLens.style.visibility = 'visible';
+                var bounds = e.target.getBoundingClientRect();
+                var mouseX = e.clientX - bounds.left;
+                var mouseY = e.clientY - bounds.top;
+
+                var lensX = mouseX - (magnifierLens.offsetWidth / 2);
+                var lensY = mouseY - (magnifierLens.offsetHeight / 2);
+
+                magnifierLens.style.left = (bounds.left + window.pageXOffset + lensX) + 'px';
+                magnifierLens.style.top = (bounds.top + window.pageYOffset + lensY) + 'px';
+
+                var bgPosX = -((mouseX * magnificationFactor) - magnifierLens.offsetWidth / 2);
+                var bgPosY = -((mouseY * magnificationFactor) - magnifierLens.offsetHeight / 2);
+
+                magnifierLens.style.backgroundImage = `url('${imageElement.src}')`;
+                magnifierLens.style.backgroundSize = `${imageElement.width * magnificationFactor}px ${imageElement.height * magnificationFactor}px`;
+                magnifierLens.style.backgroundPosition =`${bgPosX}px ${bgPosY}px`;
+
+                imageElement.style.cursor = 'none'; // Hide the cursor when magnifier is active
+            });
+
+            imageElement.addEventListener('wheel', function (e) {
+                e.preventDefault(); // Prevent the page from scrolling
+                updateMagnifierSize(e.deltaY); // Adjust the magnifier size based on scroll direction
+            }, { passive: false });
+
+            imageElement.addEventListener('mouseleave', function () {
+                magnifierLens.style.visibility = 'hidden';
+                imageElement.style.cursor = 'default'; // Reset the cursor when the mouse leaves
+            });
+        }
+
+const mainImage = document.getElementById('main-image')
+setupMagnifier(mainImage)
+    </script>
+</body>
+</html>

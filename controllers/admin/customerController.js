@@ -2,41 +2,43 @@ const User=require("../../models/userSchema");
 
 
 const customerInfo = async (req, res) => {
-    try {
-      let search = "";
-      if (req.query.search) {
-        search = req.query.search;
-      }
-      let page = 1;
-      if (req.query.page) {
-        page = req.query.page;
-      }
+  try {
+      let search = req.query.search || "";
+      let page = parseInt(req.query.page) || 1;
       const limit = 5;
+
       const userData = await User.find({
-        isAdmin: false,
-        $or: [
-          { name: { $regex: ".*" + search + ".*" } },
-          { email: { $regex: ".*" + search + ".*" } },
-        ],
+          isAdmin: false,
+          $or: [
+              { name: { $regex: ".*" + search + ".*", $options: 'i' } },
+              { email: { $regex: ".*" + search + ".*", $options: 'i' } },
+          ],
       })
-      .limit(limit * 1)
+      .limit(limit)
       .skip((page - 1) * limit)
       .exec();
 
-const count = await User.find({
-  isAdmin: false,
-  $or: [
-    { name: { $regex: ".*" + search + ".*" } },
-    { email: { $regex: ".*" + search + ".*" } },
-  ],
-}).countDocuments();
+      const totalProducts = await User.find({
+          isAdmin: false,
+          $or: [
+              { name: { $regex: ".*" + search + ".*", $options: 'i' } },
+              { email: { $regex: ".*" + search + ".*", $options: 'i' } },
+          ],
+      }).countDocuments();
 
-res.render("customers",{data:userData,totelPages:count,currentPage :limit})
+      const totalPages = Math.ceil(totalProducts / limit);
 
-    } catch (error) {
-      console.log(error)
-    }
-  };
+      res.render("customers", {
+          data: userData,
+          totalPages: totalPages,
+          currentPage: page
+      });
+
+  } catch (error) {
+      console.error(error);
+      res.status(500).render("error", { message: "An error occurred" });
+  }
+};
 
 
   

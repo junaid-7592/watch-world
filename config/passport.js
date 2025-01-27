@@ -7,15 +7,15 @@ require("dotenv").config();
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: '/auth/google/callback'
+    callbackURL: 'http://localhost:4000/auth/google/callback'
 }, async (accessToken, refreshToken, profile, done) => {
     try {
         // Search for the user with the Google ID
         let user = await User.findOne({ googleId: profile.id });
         if(user?.isBlocked===true){
-            if (user?.isBlocked === true) {
+            // if (user?.isBlocked === true) {
                 return done(null, false, { message: "User is blocked" }); // Pass custom error message
-            }
+            // }
         }
         if (user) {
             return done(null, user); // If user found, proceed to next step
@@ -41,7 +41,7 @@ passport.use(new GoogleStrategy({
 //passpot serialise cheyyunnu                    
 
 passport.serializeUser((user,done)=>{
-    console.log("asdjhfbasd,fbasdk.++++++++++++++++")
+    // console.log("asdjhfbasd,fbasdk.++++++++++++++++")
     done(null,user.id)
 })
 
@@ -49,7 +49,7 @@ passport.serializeUser((user,done)=>{
 //sessin  nn user data feach cheyth edukkan 
 
 passport.deserializeUser((id,done)=>{
-    console.log("kooooooooooooo.")
+  
     User.findById(id)
     .then(user=>{
         done(null,user)
@@ -61,4 +61,4 @@ passport.deserializeUser((id,done)=>{
 
 module.exports=passport;
                                                   
-            
+                   

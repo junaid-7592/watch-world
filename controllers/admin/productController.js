@@ -29,22 +29,21 @@ const getProductAddPage = async (req, res) => {
 const addproducts = async (req, res) => {
     try {
         const products = req.body;
-        const imagePaths = [];
-
-        if (req.files && req.files.length > 0) {
-            for (let i = 0; i < req.files.length; i++) {
-                const b64 = Buffer.from(req.files[i].buffer).toString("base64");
-                let dataURI = "data:" + req.files[i].mimetype + ";base64," + b64;
-                const cldRes = await handleUpload(dataURI)
-                imagePaths.push(cldRes.secure_url)
-            }
-        }
+     
         // Check if the product already exists
-        const productExists = await Product.findOne({
-            productName: products.productName, // Ensure correct capitalization of `productName`
-        });
+        const productExists = await Product.findOne({productName: new RegExp(`^${products.productName}$`, 'i')});
 
         if (!productExists) {
+            const imagePaths = [];
+
+            if (req.files && req.files.length > 0) {
+                for (let i = 0; i < req.files.length; i++) {
+                    const b64 = Buffer.from(req.files[i].buffer).toString("base64");
+                    let dataURI = "data:" + req.files[i].mimetype + ";base64," + b64;
+                    const cldRes = await handleUpload(dataURI)
+                    imagePaths.push(cldRes.secure_url)
+                }
+            }
             // const images = [];
             // if (req.files && req.files.length > 0) {
             //     for (let i = 0; i < req.files.length; i++) {
@@ -74,7 +73,7 @@ const addproducts = async (req, res) => {
             const categoryId = await Category.findOne({ name: products.category });
 
             if (!categoryId) {
-                return res.status(400).json({ error: "Invalid category name" });
+                return res.status(400).json({ message: "Invalid category name" });
             }
 
             // Create a new product
@@ -94,14 +93,14 @@ const addproducts = async (req, res) => {
 
             // Save the product to the database
             await newProduct.save();
-            return res.redirect("/admin/addProducts");
+            return res.status(200).json({success: true})
         } else {
             // Product already exists
-            return res.status(400).json({ error: "Product already exists, please try with another name" });
+            return res.status(400).json({ message: "Product already exists, please try with another name" });
         }
     } catch (error) {
         console.error("Error saving product", error);
-        return res.redirect("/admin/pageerror");
+        return res.status(500).json({message: 'Internal server error'});
     }
 };
 
@@ -109,7 +108,7 @@ const getAllProducts = async (req, res) => {
     try {
         const search = req.query.search || "";
         const page = req.query.page || 1;
-        const limit = 8;
+        const limit = 4;
 
         const productData = await Product.find({
             $or: [
@@ -119,9 +118,7 @@ const getAllProducts = async (req, res) => {
         }).limit(limit * 1).skip((page - 1) * limit).populate('category').exec()
 
         const count = await Product.find({
-            $or: [
-                { productNme: { $regex: new RegExp(".*" + search + ".*", "i") } },
-            ]
+            productName: {$regex: search, $options: 'i'}
         }).countDocuments();
 
 
@@ -181,6 +178,7 @@ const getEditProduct = async (req, res) => {
         res.render("edit-product", {
             product: product,
             cat: category,
+            error:null,
         })
 
     } catch (error) {
@@ -196,12 +194,17 @@ const editProduct = async (req, res) => {
         const data = req.body;
         // console.log("rer .body 0000000000000000000000000000",req.body)
         const existingProduct = await Product.findOne({
-            productName: data.productName,
+            productName: new RegExp(`^${data.productName}$`,'i'),
             _id: { $ne: id }
         });
 
         if (existingProduct) {
-            return res.status(400).json({ error: "Product with this name already exists. Please try with another name." });
+            const product = await Product.findOne({ _id: id });
+            const category = await Category.find({})
+            return res.render("edit-Product",{error:"Product with this name already exists. Please try with another name.",product: product,
+                cat: category,
+            });
+       
         }
 
         const images = [];
@@ -236,7 +239,7 @@ const editProduct = async (req, res) => {
         res.redirect("/admin/products");
     } catch (error) {
         console.error(error);
-        res.redirect("/pageerror");
+        res.redirect("/admin/pagerror");
 
     }
 
@@ -268,6 +271,44 @@ const deleteSingleImage = async (req, res) => {
     }    
 }
 
+const croppedImage = async (req, res) => {
+        try {
+            const productId = req.params.productId;
+            const imageIndex = req.body.index;
+    
+            if (!req.file) {
+                return res.status(400).json({ error: "No image file provided" });
+            }
+    
+            const productData = await Product.findById(productId);
+    
+            if (!productData) {
+                return res.status(404).json({ error: "Product not found" });
+            }
+    
+            const b64 = Buffer.from(req.file.buffer).toString("base64");
+            let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
+            const result = await handleUpload(dataURI);
+    
+    
+    
+            productData.productImage[imageIndex] = result.secure_url;
+    
+            await productData.save();
+    
+            res.json({
+                message: "Image updated successfully",
+                image: result.secure_url
+            });
+    
+        } catch (error) {
+            console.error('Error updating image:', error);
+            res.status(500).json({
+                error: "Failed to update image",
+                details: error.message
+            });
+        }
+}
 
 module.exports = {
     getProductAddPage,
@@ -278,4 +319,5 @@ module.exports = {
     getEditProduct,
     editProduct,
     deleteSingleImage,
+    croppedImage
 };

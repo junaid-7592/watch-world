@@ -4,7 +4,7 @@
 
 
   const userAuth=(req,res,next)=>{
-    if(req.session.User){   //if have user
+    if(req.session.user){   //if have user
         User.findById(req.session.user)  //databasil user undo? 
         .then(data=>{                        //promise use cheyth
             if(data && !data.isBlocked){    
@@ -18,7 +18,7 @@
             res.status(500).send("Internal Server error ")
         })
     }else{
-        res.redirect("/login")
+        res.redirect("/")
     }
   }
 
@@ -43,5 +43,6 @@
 
 module.exports={
     userAuth,
-    adminAuth
+    adminAuth,
+    
 }

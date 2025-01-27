@@ -15,7 +15,7 @@ const pageerror=async (req,res)=>{
 
 const loadlogin=(req,res)=>{
     if(req.session.admin){
-        return res.redirect("/admin/dashbord")
+        return res.redirect("/admin/dashboard")
     }
     res.render("adminlogin",{message:null})  //admin-login
 }

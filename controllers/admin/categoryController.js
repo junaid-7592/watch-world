@@ -32,19 +32,16 @@ const categoryInfo = async (req, res) => {
 const addCategory = async (req, res) => {
     const { name, description } = req.body;
     
-    const b64 = Buffer.from(req.file.buffer).toString("base64")
-    let dataURI = "data:" + req.file.mimetype + ";base64," + b64
-    const cldRes = await handleUpload(dataURI)
+  
     
     try {
-        const existingCategory = await Category.findOne({ name });
+        const existingCategory = await Category.findOne({name: new RegExp(`${name}$`,'i')});
         if (existingCategory) {
             return res.status(400).json({ error: "Category already exists" });
         }
         const newCategory = new Category({
             name,
             description ,
-            image : cldRes.secure_url
         });
         await newCategory.save();
         return res.status(200).json({ message: "Category added successfully" });
@@ -94,7 +91,7 @@ const editCategory = async (req, res) => {
         const { categoryName, description } = req.body;
 
         // Check if a category with the same name already exists
-        const existingCategory = await Category.findOne({ name: categoryName });
+        const existingCategory = await Category.findOne({ name: new RegExp(`${categoryName}$`,'i') });
 
         if (existingCategory) {
             // Pass the existing `category` data to re-render the page with the error message
