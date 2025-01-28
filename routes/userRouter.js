@@ -5,6 +5,7 @@ const passport = require("passport");
 const profileController=require("../controllers/user/profileController")
 const productController = require('../controllers/user/productCondroller')
 const auth = require('../middlewares/auth')
+// const Cart = require("../models/cart");
 // const {adminAuth,userAuth}=require("../middlewares/auth")
 
 
@@ -95,8 +96,24 @@ router.post("/passwordResendOtp",auth.userAuth,profileController.passwordResendO
 router.post("/conformation-forgotpass",auth.userAuth,profileController.coformationForgotpassword)
 
 
+//address managment
+router.get("/addAddress",auth.userAuth,profileController.addAddress)
+router.post("/addAddress",auth.userAuth,profileController.postAddAddress)
+router.get("/editAddress",auth.userAuth,profileController.editAddress)   
+router.post("/editAddress",auth.userAuth,profileController.postEditAddress)   
+router.get("/deleteAddress",auth.userAuth,profileController.deleteAddress)   
 
 
+
+//cart manegment
+
+ router.post("/cart/add",auth.userAuth,productController.addTocart)
+ router.get("/Cart",productController.getCart)
+router.post("/update-cart/:itemId",productController.cartUpdate)   //dynamic route
+
+
+
+router.post('/removeCartItem/:cartId/:itemId',productController.removeCartItem)
 
                                                          
 module.exports = router;                                     

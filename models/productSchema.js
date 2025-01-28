@@ -36,10 +36,10 @@ const productSchema = new Schema(
         },
         color: {
             type: String,
-            required: true, // Fixed the typo from 'requaired' to 'required'
+            required: true, 
         },
         productImage: {
-            type: [String], // Corrected spelling from 'prductImage' to 'productImage'
+            type: [String], 
             required: true,
         },
         isBlocked: {
@@ -48,15 +48,15 @@ const productSchema = new Schema(
         },
         status: {
             type: String,
-            enum: ["Available", "out of stock"], // Fixed spacing and capitalization consistency
+            enum: ["Available", "out of stock"], 
             required: true,
             default: "Available",
         },
     },
-    { timestamps: true } // Ensures createdAt and updatedAt fields are added
+    { timestamps: true } 
 );
 
-// Corrected the typo in mongoose.Model to mongoose.model
+
 const product = mongoose.model("Product", productSchema);
 
 module.exports = product;

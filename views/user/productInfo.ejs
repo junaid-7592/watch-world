@@ -316,9 +316,10 @@
                             <button class="quantity-btn" id="increaseBtn">+</button>
                         </div>
                     </div>
-
-                    <button class="btn btn-primary btn-lg mb-3 w-100">Add to Cart</button>
-                    <button class="btn btn-outline-primary btn-lg w-100">Add to Wishlist</button>
+                 
+                         <button onclick="addToCart('<%= product._id %>')"    class="btn btn-primary btn-lg mb-3 w-100">Add to Cart</button> 
+                
+                    <button  class="btn btn-outline-primary btn-lg w-100">Add to Wishlist</button>
                 </div>
             </div>
         </div>
@@ -682,5 +683,21 @@ var magnifierLens = document.createElement('div');
 const mainImage = document.getElementById('main-image')
 setupMagnifier(mainImage)
     </script>
+
+<script>
+    function addToCart(productId) { // Add to Cart function
+        fetch('/cart/add', { // API call cheyyunnu
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({  productId: productId, quantity: 1 }) // User ID & Product ID send cheyyunnu
+        })
+        .then(response => response.json()) // Response JSON akki edukkunnu
+        .then(data => {
+            alert(data.message); // Success message alert cheyyunnu
+        })
+        .catch(error => console.error("Error:", error)); // Error handle cheyyunnu
+    }
+</script>
+
 </body>
 </html>

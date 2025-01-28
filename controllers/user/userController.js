@@ -234,8 +234,7 @@ const signup= async (req,res)=>{
 const verifyOtp = async (req, res) => {
     try {
         const { otp } = req.body; 
-        console.log("Input OTP:", otp);
-
+        
         if (otp === req.session.userOtp) { 
             
 
@@ -260,7 +259,7 @@ const verifyOtp = async (req, res) => {
         console.error("Error Verifying OTP:", error);
         res.status(500).json({ success: false, message: "An error occurred" });
     }
-};
+}
 
 
 
@@ -272,7 +271,8 @@ const resendOtp=async(req,res)=>{
         }
 
         const otp=generateOtp();
-        req.session.userotp=otp; //otp assign to session
+        req.session.userOtp=otp; //otp assign to session
+
 
         const emailSent=await sendVerificationEmail(email,otp); // forwerd   email, password
         if(emailSent){

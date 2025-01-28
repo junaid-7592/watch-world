@@ -1,5 +1,6 @@
 
 const User=require("../../models/userSchema")
+const Address=require("../../models/addressSchema")
 //otp send cheyyan nodmailer
 const nodemailer=require("nodemailer")
 //re set  cheyyunna password has cheyyan  bcript module
@@ -196,15 +197,15 @@ const coformationForgotpassword = async (req, res) => {
 
 
 
-
 const userProfile=async(req,res)=>{
   try {
+    
+//mukalil  import cheytha  oro  scheemayum  profile page load akumbol acces cheyth edukkan vendi
     const userId=req.session.user;
     const userData=await User.findById(userId)
-    // console.log(hiiiiiiiiiii)
-    // console.log(userData.email)
-    res.render('profile',{
-      user:userData,
+    const AddressData=await Address.findOne({userId : userId});
+     res.render('profile',{
+      user:userData,userAddress:AddressData
           
     })
 
@@ -214,6 +215,8 @@ const userProfile=async(req,res)=>{
     
   }
 } 
+
+
 
 const changePassword=async(req,res)=>{
   try {
@@ -345,10 +348,122 @@ res.status(500).json({success:false,messege:"Internel Server Error.please try ag
 
 }
 }
+
+
+const addAddress=async(req,res)=>{
+  try {
+   const user=req.session.user;
+   res.render("add-address",{user:user}) 
+  } catch (error) {
+   res.redirect("/pageNoteFound") 
+  }
+}
  
+const postAddAddress=async(req,res)=>{
+  try {
+    const userId=req.session.user;
+    const userData=await User.findOne({_id:userId});
+    const {addressType,name,city,landMark,state,pincode,phone,altPhone}=req.body
+
+    const userAddress=await Address.findOne({userId:userData._id})
+    if(!userAddress){
+      const newAddress=new Address({
+        userId:userData._id,
+        address:[{addressType,name,city,landMark,state,pincode,phone,altPhone}]
+      })
+      await newAddress.save()
+    }else{
+      userAddress.address.push({addressType,name,city,landMark,state,pincode,phone,altPhone})
+      await userAddress.save()
+     }
+    
+    res.redirect("/profile")
+  } catch (error) {
+    console.error("Error adding address:",error);
+    res.redirect("/pageNotFound")
+  }
+}
+
+const editAddress=async(req,res)=>{
+  try {
+    const addressId=req.query.id;
+    const user=req.session.user;
+    const currAddress=await Address.findOne({
+      "address._id":addressId,
+    });
+    if(!currAddress){
+      return res.redirect("/pageNotFound")
+      
+    }
+
+    //usernte  address edukkan 
+    const addressData =currAddress.address.find((item)=>{    //find methord  in mongodb serch
+      return item._id.toString()===addressId.toString();
+    })
+    if(!addressData){
+      return res.redirect("/pageNotFound")
+    }
+    res.render("edit-address",{address:addressData,user:user})
+  } catch (error) {
+   console.error("Error in edit address",error) 
+   res.redirect("/pageNotFound")
+  }
+}
+   
+const postEditAddress=async(req,res)=>{
+try {
+  const data=req.body;
+  const addressId=req.query.id;
+  const user=req.session.user;
+  const findAddress=await Address.findOne({"address._id":addressId});
+  if(!findAddress){
+    res.redirect("pageNotFound")
+  }
+  await Address.updateOne(
+    {"address._id":addressId} ,
+    {$set :{
+      "address.$":{
+        _id:addressId,
+        addressType:data.addressType,
+        name:data.name,
+        city:data.city,
+        landMark:data.landMark,
+        state:data.state,
+        pincode:data.pincode,
+        phone:data.phone,
+        altPhone:data.altPhone,
+       }
+    }}
+    
+   )
+  res.redirect("/profile")
+
+} catch (error) {
+ console.error("Error in edit address",error) 
+ res.redirect("/pageNotFound")
+}
+}
 
 
-                
+const deleteAddress=async(req,res)=>{
+  try {
+ const addressId=req.query.id;
+ const findAddress=await Address.findOne({"address._id":addressId});
+ if(!findAddress){
+  return res.status(400).send("address not found")
+ }  
+
+ await Address.updateOne({
+  "address._id":addressId,
+
+ },{$pull:{address:{_id:addressId,}}})
+ res.redirect("/profile")
+
+  } catch (error) {
+   console.error("Error in delete address",error) 
+   res.redirect("pageNotFound")
+  }
+}
 
 module.exports={
     getForgotPassPage,
@@ -358,6 +473,11 @@ module.exports={
       changePassword,
       verifyOtpChangePasswordPage,
       coformationForgotpassword,
-      passwordResendOtp
+      passwordResendOtp,
+      addAddress,
+      postAddAddress,
+      editAddress,
+      postEditAddress,
+      deleteAddress,
   
 }               
