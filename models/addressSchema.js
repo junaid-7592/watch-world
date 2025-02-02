@@ -10,10 +10,7 @@ const addressSchema= new Schema({
     required:true
    },
    address:[{
-    addressType:{
-        type:String,
-        required:true
-    },
+  
     name:{
         type:String,
         required:true

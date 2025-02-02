@@ -9,6 +9,7 @@ const bcrypt=require("bcrypt")
 const env=require("dotenv").config()
 //otp send cheyyumbol verify cheyyan session handle cheyyanam  (sessionil stor cheyyanam)
 const session=require("express-session")
+const Order = require("../../models/orderSChema")
 
 
 
@@ -202,11 +203,17 @@ const userProfile=async(req,res)=>{
     
 //mukalil  import cheytha  oro  scheemayum  profile page load akumbol acces cheyth edukkan vendi
     const userId=req.session.user;
+    console.log(userId)
     const userData=await User.findById(userId)
     const AddressData=await Address.findOne({userId : userId});
+    const orders = await Order.find({userId})
+    console.log( " this order details of ",orders)
+
+    console.log(orders)
      res.render('profile',{
-      user:userData,userAddress:AddressData
-          
+      user:userData,
+      userAddress:AddressData,
+      orders:orders   
     })
 
   } catch (error) {
@@ -384,6 +391,8 @@ const postAddAddress=async(req,res)=>{
   }
 }
 
+
+
 const editAddress=async(req,res)=>{
   try {
     const addressId=req.query.id;
@@ -444,6 +453,22 @@ try {
 }
 }
 
+const orderViewLoad = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const order = await Order.findOne({ _id: orderId }).populate("orderedItems.product")
+    // console.log("---------------------------------------")
+  //  console.log(order)
+    if (!order) {
+      return res.status(404).send("Order not found");
+    }
+
+    res.render("ordersView", { order }); 
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
 
 const deleteAddress=async(req,res)=>{
   try {
@@ -465,6 +490,50 @@ const deleteAddress=async(req,res)=>{
   }
 }
 
+const addresspageShow=async(req,res)=>{
+  try {
+   const user=req.session.user;
+   res.render("add-fromCheckout",{user:user}) 
+  } catch (error) {
+   res.redirect("/pageNoteFound") 
+  }
+}
+
+
+const postaddressAdd = async (req, res) => {
+  try {
+    const userId = req.session.user;
+    console.log("111111111111111",userId);
+    const userData = await User.findOne({ _id: userId });
+    const { addressType, name, city, landMark, state, pincode, phone, altPhone } = req.body;
+    console.log("222222222222",userData);
+    const userAddress = await Address.findOne({ userId: userData._id });
+    console.log("33333333333",userAddress);
+    if (!userAddress) {
+      const newAddress = new Address({
+        userId: userData._id,
+        address: [{ addressType, name, city, landMark, state, pincode, phone, altPhone }]
+      });
+      await newAddress.save();
+    } else {
+      userAddress.address.push({ addressType, name, city, landMark, state, pincode, phone, altPhone });
+      await userAddress.save();
+    }
+
+    return res.json({ success: true, message: "Address added successfully!" });
+  } catch (error) {
+    console.error("Error adding address:", error);
+    return res.status(500).json({ success: false, message: "Failed to add address!" });
+  }
+};
+
+
+
+
+
+
+
+
 module.exports={
     getForgotPassPage,
     forgotEmailValid,
@@ -479,5 +548,8 @@ module.exports={
       editAddress,
       postEditAddress,
       deleteAddress,
-  
-}               
+      orderViewLoad,
+      addresspageShow,
+      postaddressAdd,
+
+}             

@@ -288,6 +288,11 @@
                </div>
 
 
+
+
+
+
+               
                <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
                  <div class="card">
                    <div class="card-header">
@@ -305,14 +310,16 @@
                            </tr>
                          </thead>
                          <tbody>
+                           <% orders.forEach((data,index)=>{ %>
                            <tr>
-                             <td></td>
-                             <td></td>
-                             <td></td>
-                             <td>
-                               <a href="" class="btn-small d-block">View</a>
-                             </td>
-                           </tr>
+                              <td><%= index+1 %></td>
+                              <td><%= data.status %></td>
+                              <td><%= data.finalAmount %></td>
+                              <td>
+                                <a href="/profile/orders/view/<%= data._id %>" class="btn-small d-block">View</a>
+                              </td>
+                            </tr>
+                            <% }) %>
                          </tbody>
                        </table>
                      </div>

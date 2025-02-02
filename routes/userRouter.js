@@ -70,11 +70,14 @@ router.get('/auth/google/callback',
 );
 
 router.get("/shop",userController.shopget)
+router.get("/products",userController.getSortedProducts);
+
 //profile manegment
 
 router.get("/forgot-password",profileController.getForgotPassPage)
 router.post("/forgot-email-valid",profileController.forgotEmailValid)
 router.post("/VerifyOtp-changepassword",profileController.verifyOtpChangePasswordPage)
+router.get("/profile/orders/view/:orderId",profileController.orderViewLoad)
 
 
 
@@ -102,18 +105,25 @@ router.post("/addAddress",auth.userAuth,profileController.postAddAddress)
 router.get("/editAddress",auth.userAuth,profileController.editAddress)   
 router.post("/editAddress",auth.userAuth,profileController.postEditAddress)   
 router.get("/deleteAddress",auth.userAuth,profileController.deleteAddress)   
-
-
+router.get("/addAddressFromcheckout",auth.userAuth,profileController.addresspageShow)
+router.post("/addAddressFromcheckout",auth.userAuth,profileController.postaddressAdd)
+    
 
 //cart manegment
 
  router.post("/cart/add",auth.userAuth,productController.addTocart)
  router.get("/Cart",productController.getCart)
 router.post("/update-cart/:itemId",productController.cartUpdate)   //dynamic route
+router.post("/cart-updateTotal",productController.updateTotel)
+router.get('/checkout',productController.getCheckout)
+router.get('/orderSuccess',auth.userAuth,productController.getOrderSuccess)
+router.post('/orderSuccess',auth.userAuth,productController.OrderSuccess)
+router.post('/order/cancel/:orderId',auth.userAuth,productController.cancelOrder)
+
 
 
 
 router.post('/removeCartItem/:cartId/:itemId',productController.removeCartItem)
 
                                                          
-module.exports = router;                                     
+module.exports = router;                                                  

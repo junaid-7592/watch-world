@@ -1,0 +1,284 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Order List</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Admin Order List</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>#12345</td>
+                    <td>Product A</td>
+                    <td>2</td>
+                    <td>$50</td>
+                    <td>
+                        <select class="status-dropdown" onchange="validateStatus(this)">
+                            <option value="pending">Pending</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="canceled">Canceled</option>
+                        </select>
+                    </td>
+                    <td><button class="cancel-btn" onclick="cancelOrder(this)">Cancel Order</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <script>
+        function validateStatus(selectElement) {
+            let selectedValue = selectElement.value;
+            let cancelButton = selectElement.closest('tr').querySelector('.cancel-btn');
+            
+            if (selectedValue === 'delivered') {
+                cancelButton.disabled = true;
+            } else {
+                cancelButton.disabled = false;
+            }
+
+            if (selectedValue === 'canceled') {
+                selectElement.disabled = true;
+            }
+        }
+
+        function cancelOrder(button) {
+            let row = button.closest('tr');
+            let statusDropdown = row.querySelector('.status-dropdown');
+            
+            if (statusDropdown.value === 'delivered') {
+                alert("Delivered orders cannot be canceled!");
+                return;
+            }
+            
+            statusDropdown.value = 'canceled';
+            statusDropdown.disabled = true;
+            button.disabled = true;
+        }
+    </script>
+</body>
+</html>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        padding: 20px;
+    }
+    .container {
+        max-width: 800px;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin: auto;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th, td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: center;
+    }
+    select, button {
+        padding: 5px;
+        font-size: 16px;
+    }
+    button {
+        background-color: red;
+        color: white;
+        border: none;
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 5px;
+    }
+    button:disabled {
+        background-color: grey;
+        cursor: not-allowed;
+    }
+</style> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Order Details</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .search-bar {
+            margin-bottom: 20px;
+        }
+
+        .search-bar input {
+            width: 300px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .status {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .status.pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status.paid {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .view-btn {
+            padding: 6px 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .view-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .payment-method {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .payment-method.cod {
+            background-color: #e2e3e5;
+            color: #383d41;
+        }
+
+        .payment-method.online {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Order Details</h1>
+        
+        <div class="search-bar">
+            <input type="text" placeholder="Search orders...">
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Order ID</th>
+                    <th>Date</th>
+                    <!-- <th>Customer Name</th> -->
+                    <th>Total Amount</th>
+                    <th>Payment Method</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <%orders%>
+                <% orders.forEach((order, index) => { %>
+                <tr>
+                    <td><%= index + 1 %></td>
+                    <td>ORD-2025-<%= order._id %></td> 
+                    <td><%= new Date(order.createdAt).toDateString() %></td>
+                    <!-- <td>ORD-2025-001</td> -->
+                    <!-- <td>2025-02-01</td> -->
+                    <!-- <td>John Doe</td> -->
+                    <td><%=order.totalPrice%></td>
+                    <td><span class="payment-method cod"></span><%= order.paymentMethod  %></td>
+                    <td><span class="status pending"><%=order.status%></span></td>
+                    <td><a href="/admin/viewOrderdetails/<%= order._id %>" class="view-btn">View</a></td>
+                </tr>
+                <% }) %>
+                <!-- <tr>
+                    <td>#2</td>
+                    <td>ORD-2025-002</td>
+                    <td>2025-02-01</td>
+                    <td>Jane Smith</td>
+                    <td>$549.99</td>
+                    <td><span class="payment-method online">Online Payment</span></td>
+                    <td><span class="status paid">Paid</span></td>
+                    <td><a href="#" class="view-btn">View</a></td>
+                </tr> -->
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

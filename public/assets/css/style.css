@@ -82,7 +82,6 @@
 ========================================*/
 html, body {height: 100%;}
 .floatleft {float:left}
-.floatright {float:right}
 .alignleft {float:left;margin-right:15px;margin-bottom: 15px}
 .alignright {float:right;margin-left:15px;margin-bottom: 15px}
 .aligncenter {display:block;margin:0 auto 15px}

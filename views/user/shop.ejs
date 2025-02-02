@@ -2,7 +2,36 @@
 <%-include ("../../views/partials/user/header") %>
 
 
+<style>
+	.shop-layout .sort-dropdown {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
 
+.shop-layout .sort-dropdown label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+}
+
+.shop-layout .sort-dropdown select {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+/* Ensure it only affects the dropdown in .shop-layout */
+.shop-layout .sort-dropdown select:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+</style>
 							
 					
 	
@@ -189,24 +218,10 @@
 						<!-- Left Sidebar-->
 						<div class="left-sidebar">
 							<div class="left-sidebar-title">
-								<h2>Shop By</h2>
+								<!-- <h2>SORT BY</h2> -->
 							</div>
 							<!-- Shop Layout -->
-							<div class="shop-layout">
-								<div class="layout-title">
-									<h2>Category</h2>
-								</div>
-								<div class="layout-list">
-									<ul>
-										<li><a href="#">MENS</a></li>
-										<li><a href="#">Womens</a></li>
-										<li><a href="#">KIDS</a></li>
-										<!-- <li><a href="#">Clothing</a></li>
-										 
-										  -->
-									</ul>
-								</div>
-							</div><!-- End Shop Layout Area -->
+							
 							<!-- Price Filter -->
 							<div class="price-filter-area shop-layout">
 								<div class="price-filter">
@@ -221,22 +236,29 @@
 								</div>
 							</div><!-- End Price Filter Area -->
 							<!-- Shop Layout -->
-							<div class="shop-layout">
-								<!-- <div class="layout-title">
-									<h2>Manufacturer</h2>
-								</div>
-								<div class="layout-list">
-									<ul>
-										<li><a href="#">Adidas</a></li>
-										<li><a href="#">Chanel</a></li>
-										<li><a href="#">Dolce</a></li>
-										<li><a href="#">Gabbana</a></li>
-										<li><a href="#">Nike</a></li>
-										<li><a href="#">Vogue</a></li>
-									</ul>
-								</div> -->
-							</div><!-- End Shop Layout Area -->
-							<!-- Shop Layout -->
+							 <div>
+								<h2>SORT BY</h2>
+							 </div>
+							
+
+							<select id="sort-by" onchange="applySorting()" style="margin-bottom: 15px; width: 16rem; height: 3rem; font-size: larger;">
+								<option value="" disabled selected>Select Item</option>
+								<option value="popularity">Popularity</option>
+								<option value="low-to-high">Price: Low to High</option>
+								<option value="high-to-low">Price: High to Low</option>
+								<option value="average-ratings">Average Ratings</option>
+								<option value="featured">Featured</option>
+								<option value="new-arrivals">New Arrivals</option>
+								<option value="a-z">A - Z</option>
+								<option value="z-a">Z - A</option>
+							</select>
+							
+						
+							
+							
+    
+
+						
 							<div class="shop-layout">
 								<div class="layout-title">
 									<h2>Color</h2>
@@ -448,4 +470,57 @@
 			  
 				  <!-- Main JS -->
 				  <script src="assets/js/main.js"></script>
-			  
+			  	<script>
+					function applySorting() {
+    const sortBy = document.getElementById("sort-by").value;
+    console.log("Selected Sorting:", sortBy);
+
+    fetch(`/products?sort=${sortBy}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log("Sorted Products:", data);
+            updateProductList(data); // UI update function call cheyyuka
+        })
+        .catch(error => console.error("Error fetching products:", error));
+}
+
+
+function updateProductList(products) {
+    const productContainer = document.querySelector(".products"); // Products container edukkanam
+    productContainer.innerHTML = ""; // Old products remove cheyyuka
+    
+    products.forEach(prod => {
+        const productHTML = `
+            <div class="singel-product single-product-col">
+                <div class="label-pro-new">New</div>
+                <div class="carousel-inner">
+                    ${prod.productImage.map((image, index) => `
+                        <div class="carousel-item ${index === 0 ? 'active' : ''}">
+                            <img src="${image}" onclick="window.location.href='/productinfo?id=${prod._id}'" class="d-block w-100" alt="${prod.productName}">
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="single-product-content">
+                    <h2 class="product-name">
+                        <a href="/productinfo?id=${prod._id}">${prod.productName}</a>
+                    </h2>
+                    <div class="ratings">
+                        <div class="rating-box">
+                            <div class="rating">
+                                ${'<i class="fa fa-star"></i>'.repeat(prod.rating)}
+                                ${'<i class="fa fa-star-o"></i>'.repeat(5 - prod.rating)}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="product-price">
+                        <p>$${prod.salePrice}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        productContainer.innerHTML += productHTML;
+    });
+}
+
+					
+					</script>

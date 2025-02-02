@@ -103,43 +103,62 @@
           placeholder="Enter your password"
           required
         />
-        <div id="passwordError" class="error-message"></div>
+        <div id="passwordError" class="error-message"><%= message%></div>
       </div>
       <button type="submit" class="btn btn-primary">Log In</button>
     </form>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <script src="/js/jquery.min.js"></script>
   <script src="/js/bootstrap.bundle.min.js"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const adminLoginForm = document.getElementById("adminLoginForm");
-      const emailField = document.getElementById("adminEmail");
-      const passwordField = document.getElementById("adminPassword");
-      const emailError = document.getElementById("emailError");
-      const passwordError = document.getElementById("passwordError");
+    // document.addEventListener("DOMContentLoaded", function () {
+    //   const adminLoginForm = document.getElementById("adminLoginForm");
+    //   const emailField = document.getElementById("adminEmail");
+    //   const passwordField = document.getElementById("adminPassword");
+    //   const emailError = document.getElementById("emailError");
+    //   const passwordError = document.getElementById("passwordError");
 
-      adminLoginForm.addEventListener("submit", function (event) {
-        let isValid = true;
-        const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-        if (!emailPattern.test(emailField.value)) {
-          emailError.textContent = "Invalid email format";
-          isValid = false;
-        } else {
-          emailError.textContent = "";
-        }
-        if (passwordField.value.length < 8) {
-          passwordError.textContent =
-            "Password should contain at least 8 characters";
-          isValid = false;
-        } else {
-          passwordError.textContent = "";
-        }
+    //   adminLoginForm.addEventListener("submit", function (event) {
+    //     let isValid = true;
+    //     const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    //     if (!emailPattern.test(emailField.value)) {
+    //       emailError.textContent = "Invalid email format";
+    //       isValid = false;
+    //     } else {
+    //       emailError.textContent = "";
+    //     }
+    //     if (passwordField.value.length < 8) {
+    //       passwordError.textContent =
+    //         "Password should contain at least 8 characters";
+    //       isValid = false;
+    //     } else {
+    //       passwordError.textContent = "password incorrect";
+    //     }
 
-        if (!isValid) {
-          event.preventDefault();
-        }
+    //     if (!isValid) {
+    //       event.preventDefault();
+    //     }
+    //   });
+    // });
+
+    
+  document.addEventListener("DOMContentLoaded", function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const errorMessage = urlParams.get('error');
+
+    if (errorMessage) {
+      Swal.fire({
+        icon: "error",
+        title: "Login Failed",
+        text: errorMessage,
+        confirmButtonColor: "#007bff",
       });
-    });
-  </script>
+    }
+  });
+</script>
+
+  
 </body>
 </html> 

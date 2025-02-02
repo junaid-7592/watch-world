@@ -12,9 +12,8 @@ const productSchema = new Schema(
             type: String,
             required: true,
         },
-        brand: {
-            type: String
-        },
+        
+        
         category: {
             type: Schema.Types.ObjectId,
             ref: "Category",
@@ -52,6 +51,10 @@ const productSchema = new Schema(
             required: true,
             default: "Available",
         },
+        createdAt:{
+            type:Date,
+            default:Date.now
+        }
     },
     { timestamps: true } 
 );

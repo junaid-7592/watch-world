@@ -25,17 +25,27 @@ const loadlogin=(req,res)=>{
 const login=async (req,res)=>{
 try {
     const{email,password}=req.body;
+    console.log(password)
     const admin=await User.findOne({email,isAdmin:true});
+    console.log(admin);
+    
     if(admin){
-        const passwordMarch=bcrypt.compare(password,admin.password)
+        const passwordMarch= await bcrypt.compare(password,admin.password)
+
+        
+
         if(passwordMarch){
             req.session.admin=true;
             return res.redirect('/admin')
            }else{
-            return res.redirect("/login")
+            // return res.redirect("/login")
+            return res.redirect("/admin/login?error=Incorrect password");
         }
     }else{
-        return res.redirect("/login")
+        // return res.status(500).render("login", { message: "Invalid credentials" });
+        return res.redirect("/admin/login?error=User not found");
+
+        
     }
 } catch (error) {
     console.log("log in error", error)

@@ -317,14 +317,17 @@
             throw new Error(data.message);
 
         }
-        if(data.success) {
-                Swal.fire({
-                title: 'Success!',
-                text: 'added seccessfully.',
-                icon: 'success',
-                confirmButtonText: 'OK'
-            });
-        }
+        if (data.success) {
+  Swal.fire({
+    title: "Success!",
+    text: "Added successfully.",
+    icon: "success",
+    confirmButtonText: "OK",
+  }).then(() => {
+    window.location.href = "/admin/products";
+  });
+}
+
     } catch (error) {
         Swal.fire({
             title: 'Oops!',

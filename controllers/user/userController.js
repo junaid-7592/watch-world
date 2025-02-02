@@ -325,10 +325,60 @@ const shopget = async (req, res) => {
         return res.status(500).render("error", { message: "An error occurred while fetching products" });
     }
 };
-                            
 
-         
-      
+
+// const Product = require("../models/Product");
+
+// Controller function for sorting products
+const getSortedProducts = async (req, res) => {
+    try {       
+        
+
+
+
+        let { sort } = req.query;
+        console.log("sortssssssssssssssss",sort)
+        let sortQuery = {};
+
+        switch (sort) {
+            case "popularity":
+                sortQuery = { rating: -1 }; // Highest rating first
+                break;
+            case "low-to-high":
+                sortQuery = {salePrice: 1 }; // Price ascending
+                break;
+            case "high-to-low":
+                sortQuery = { salePrice: -1 }; // Price descending
+                break;
+            case "average-ratings":
+                sortQuery = { rating: -1 }; // Highest rating first
+                break;
+            // case "featured":
+            //     sortQuery = { featured: -1 }; // Show featured products first
+            //     break;
+            case "new-arrivals":
+                sortQuery = { createdAt: -1 }; // Latest products first
+                break;
+            case "a-z":
+                sortQuery = { productName: 1 }; // Alphabetical order
+                break;
+            case "z-a":
+                sortQuery = { productName: -1 }; // Reverse alphabetical order
+                break;
+        }
+        const products = await product.find().sort(sortQuery);
+        console.log("hooooooooooooooooo",products)
+
+        res.json(products);
+    } catch (error) {
+        res.status(500).json({ error: "Failed to fetch products" });
+        console.log(error);
+        
+    }
+};
+
+
+
 module.exports={
     loadHomepage,
     pageNotFound,
@@ -340,6 +390,7 @@ module.exports={
     login,
     logout,
     shopget,
+    getSortedProducts ,
 } ;                                                   
 
 

@@ -4,7 +4,8 @@ const adminController=require("../controllers/admin/adminController");
 const{userAuth,adminAuth}=require("../middlewares/auth");
 const customerController=require("../controllers/admin/customerController")
 const categoryController=require("../controllers/admin/categoryController")
-const productController=require("../controllers/admin/productController");
+const productController=require("../controllers/admin/productController")
+const orderController=require("../controllers/admin/orderController")
 const storage = require("../controllers/admin/productController");
 const upload = require("../config/multer");
 
@@ -47,9 +48,18 @@ router.post("/addProducts",upload.array("images"), adminAuth, productController.
 // router.post("/addProducts",adminAuth,uploads.array("images",3), productController.addproducts);
 
 
+//order management
 
+router.get("/orderList",adminAuth,orderController.showOrderList)
+router.get("/viewOrderdetails/:id",adminAuth,orderController.getViewOrderdetails)
+// router.put("/chaingeStatus",adminAuth,orderController.statusChange)        
+// router.put("/chaingeStatus", adminAuth, orderController.statusChange);
 
+// router.put("/cancel/:id",adminAuth, orderController.cancelOrder);
 
+ 
+router.put("/orders/update-status/:orderId", adminAuth, orderController.updateStatus);  // fetch(`/update-status/orders/${orderId}/
+router.put("/orders/cancel-status/:orderId",adminAuth,orderController.canselOrder)
 
 
 

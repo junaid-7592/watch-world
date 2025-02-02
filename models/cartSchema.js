@@ -7,8 +7,8 @@ const cartSchema = new Schema({
         ref: 'User',
         required: true,
     },
-    items: [{
-        
+    items: {
+        type: [{
             productId: {
                 type: Schema.Types.ObjectId,
                 ref: 'Product',
@@ -22,15 +22,17 @@ const cartSchema = new Schema({
                 type: Number,
                 required: true,
             },
-            status:{
-                type:String,
-                default:"placed"
+            status: {
+                type: String,
+                default: "placed"
             },
-            cancellationReason:{
-               type:String,
-               default:"none" ,    
+            cancellationReason: {
+                type: String,
+                default: "none",
             }
         }],
+        default: [] 
+    },
 });
 
 const Cart = mongoose.model('Cart', cartSchema);
