@@ -12,245 +12,102 @@
             </div>
             <div class="row">
                 <div class="col-md-12">
-                    <!-- Cart Item -->
-                    <div class="chart-item table-responsive fix">
-                        <table class="col-md-12">
-                            <thead>
-                                <tr>
-                                    <th class="th-delate">Remove</th>
-                                    <th class="th-product">Images</th>
-                                    <th class="th-details">Product Name</th>
-                                    <!-- <th class="th-edit">Edit</th> -->
-                                    <th class="th-price">Unit Price</th>
-                                    <th class="th-qty">Qty</th>
-                                    <th class="th-total">Subtotal</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-
-                                <% if ( cart.items.length> 0) { %>
-                                    <% cart?.items?.forEach((item)=> { %>
+                    <% if (cart && cart.items && cart.items.length > 0) { %>
+                        <!-- Cart Item -->
+                        <div class="chart-item table-responsive fix">
+                            <table class="col-md-12">
+                                <thead>
+                                    <tr>
+                                        <th class="th-delate">Remove</th>
+                                        <th class="th-product">Images</th>
+                                        <th class="th-details">Product Name</th>
+                                        <th class="th-price">Unit Price</th>
+                                        <th class="th-qty">Qty</th>
+                                        <th class="th-total">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% cart.items.forEach((item) => { %>
                                         <tr>
-                                            <input type="hidden" value="<%=cart._id %>" id="cartIdUpdate">
+                                            <input type="hidden" value="<%= cart._id %>" id="cartIdUpdate">
                                             <td class="th-delate">
-                                                <a onclick="deleteCartItem('<%= cart._id %>', '<%= item._id %>')"><i
-                                                        class="fa fa-trash"></i></a>
+                                                <a onclick="deleteCartItem('<%= cart._id %>', '<%= item._id %>')">
+                                                    <i class="fa fa-trash"></i>
+                                                </a>
                                             </td>
-
-
-
                                             <td class="th-product">
-                                                <a href="#"><img src="<%= item.productId.productImage[0] %>"
-                                                        alt="cart"></a>
+                                                <a href="#"><img src="<%= item.productId.productImage[0] %>" alt="cart"></a>
                                             </td>
                                             <td class="th-details">
                                                 <h2><a href="#">
                                                         <%= item.productId.productName %>
                                                     </a></h2>
                                             </td>
-                                            <td class="th-price">$<%= item.price.toFixed(2) %>
-                                            </td>
+                                            <td class="th-price">$<%= item.price.toFixed(2) %></td>
                                             <td class="th-qty">
-
-
-
-
-
-
                                                 <div class="d-flex align-items-center">
                                                     <button class="btn btn-sm btn-outline-secondary"
                                                         onclick="changeQuantity('<%= item._id %>', 'decrement')">
                                                         <i class="fas fa-minus"></i>
                                                     </button>
-
                                                     <input type="text" class="form-control mx-2 text-center"
                                                         style="width: 60px;" id="qty-<%= item._id %>"
                                                         value="<%= item.quantity || 1 %>" min="1"
                                                         data-item-id="<%= item._id %>"
                                                         onchange="updateQuantity('<%= item._id %>', this)">
-
                                                     <button class="btn btn-sm btn-outline-secondary"
                                                         onclick="changeQuantity('<%= item._id %>', 'increment')">
                                                         <i class="fas fa-plus"></i>
                                                     </button>
                                                 </div>
-
-
-
-
-
                                             </td>
-                                            <td class="th-total" id="total-<%= item._id %>">$<%= (item.price *
-                                                    item.quantity).toFixed(2) %>
-                                            </td>
+                                            <td class="th-total" id="total-<%= item._id %>">$<%= (item.price * item.quantity).toFixed(2) %></td>
                                         </tr>
-                                        <% }) %>
-
-
-                            </tbody>
-
-
-                        </table>
-                    </div><!-- End Cart Item -->
-                    <div class="shoping-cart-button">
-                        <div class="cart-button-left">
-                            <button type="button" class="btn custom-button">Continue Shopping</button>
+                                    <% }) %>
+                                </tbody>
+                            </table>
                         </div>
-                        <div class="cart-button-right">
-                            <button type="button" class="btn custom-button">Update Shopping Cart</button>
-                            <button type="button" class="btn custom-button">Clear Shopping Cart</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="cart-shopping-area fix">
-                <!-- Cart Shoping Area -->
-                <div class="row">
-                    <div class="col-lg-4 col-md-12">
-                        <div class="calculate-shipping chart-all fix">
-                            <h2>Estimate Shipping and Tax</h2>
-                            <div class="cart-all-inner">
-                                <p>Enter your destination to get a shipping estimate.</p>
-                                <h3>Country <sup>*</sup></h3>
-                                <select>
-                                    <option value="AF">Afghanistan</option>
-                                    <option value="AX">Åland Islands</option>
-                                    <option value="AL">Albania</option>
-                                </select>
-                                <h3>State/Province</h3>
-                                <select>
-
-                                    <option value="65">Wyoming</option>
-                                </select>
-                                <h3>Zip/Postal Code</h3>
-                                <input type="text">
-                                <div class="shiping-cart-button">
-                                    <button type="button" class="btn custom-button">Get A Quote</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-12">
-                        <div class="chart-all fix">
-                            <h2>Discount Codes</h2>
-                            <div class="cart-all-inner">
-                                <p>Enter your coupon code if you have one.</p>
-                                <input type="text">
-                                <div class="shiping-cart-button">
-                                    <button class="btn custom-button" type="button">Apply Coupon</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-12">
+                        
+                        <!-- Cart Summary -->
                         <div class="shopping-summary chart-all fix">
                             <div class="shopping-cost-area">
-
-                                <!-- <div class="shopping-cost">
-                                <div class="shopping-cost-right">
-                                    <p id="subTotal">$2,010.00</p>
-                                    <p id="grandTotal">$2,010.00</p>
-                                   
-                                 </div>
-                                <div class="shopping-cost-left">
-                                    <p class="floatright">Sub Total </p>
-                                    <p>GRAND TOTAL</p>
-                                
-                            </div> -->
-
-
-
-
-
-                                <div class="shiping-cart-button">
-                                    <!-- <button type="button" class="btn custom-button">Proceed to Checkout</button> -->
-
-                                    <div class="shopping-cost">
-                                        <div class="shopping-cost-right">
-                                            <% let grandTotal=0; %>
-                                                <% cart.items.forEach((item)=> {
-                                                    let subTotal = item.price * item.quantity;
-                                                    grandTotal += subTotal;
-                                                    %>
-                                                    <p id="subTotal<%= item._id %>">$<%= subTotal.toFixed(2) %>
-                                                    </p>
-                                                    <% }) %>
-                                                        <p id="grandTotal">$<%= grandTotal.toFixed(2) %>
-                                                        </p>
-                                        </div>
-
-                                        <div class="shopping-cost-left">
-                                            <% cart.items.forEach((item)=> { %>
-                                                <p class="floatright">
-                                                    <%= item.productId.productName %>
-                                                </p>
-                                                <% }) %>
-                                                    <p>GRAND TOTAL</p>
-                                        </div>
+                                <div class="shopping-cost">
+                                    <div class="shopping-cost-right">
+                                        <% let grandTotal = 0; %>
+                                        <% cart.items.forEach((item) => { 
+                                            let subTotal = item.price * item.quantity;
+                                            grandTotal += subTotal;
+                                        %>
+                                            <p id="subTotal<%= item._id %>">$<%= subTotal.toFixed(2) %></p>
+                                        <% }) %>
+                                        <p id="grandTotal">$<%= grandTotal.toFixed(2) %></p>
                                     </div>
-
-
-                                    <input type="hidden" id="cartIdUpdate" value="<%= cart._id %>">
-
-                                    <button id="proceedCheckout" onclick="window.location.href='/checkout'"
-                                        class="btn custom-button">
-                                        Proceed to Checkout
-                                    </button>
-
-
+                                    <div class="shopping-cost-left">
+                                        <% cart.items.forEach((item) => { %>
+                                            <p class="floatright"><%= item.productId.productName %></p>
+                                        <% }) %>
+                                        <p>GRAND TOTAL</p>
+                                    </div>
                                 </div>
-
-
-
-
-
-                                <a href="#">Checkout with Multiple Addresses</a>
+                                <button id="proceedCheckout" onclick="window.location.href='/checkout'" class="btn custom-button">
+                                    Proceed to Checkout
+                                </button>
                             </div>
                         </div>
-                    </div>
-                </div><!-- End Cart Shoping Area -->
-            </div>
-        </div>
-    </div><!-- End Cart Area -->
-    <!-- Brand Area -->
-    <div class="brand-area">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4">
-                    <div class="brand-add">
-                        <a href="#"><img src="assets/images/brand-logo/bl5.webp" alt="brand-logo"></a>
-                    </div>
-                </div>
-                <div class="col-lg-8">
-                    <!-- Brand Logo -->
-                    <div class="brand-logo">
-                        <div id="logo-carousel" class="owl-carousel">
-                            <a href="#"><img src="assets/images/brand-logo/bl1.webp" alt="brand-logo"></a>
-                            <a href="#"><img src="assets/images/brand-logo/bl2.webp" alt="brand-logo"></a>
-                            <a href="#"><img src="assets/images/brand-logo/bl3.webp" alt="brand-logo"></a>
-                            <a href="#"><img src="assets/images/brand-logo/bl4.webp" alt="brand-logo"></a>
-                            <a href="#"><img src="assets/images/brand-logo/bl1.webp" alt="brand-logo"></a>
-                            <a href="#"><img src="assets/images/brand-logo/bl2.webp" alt="brand-logo"></a>
-                            <a href="#"><img src="assets/images/brand-logo/bl3.webp" alt="brand-logo"></a>
-                            <a href="#"><img src="assets/images/brand-logo/bl4.webp" alt="brand-logo"></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <% } else { %>
-
-            <h1 style="color: red;">Cart Is Empty</h1>
-            <a href="/shop" class="text-decoration-none">
-                <div class="card shadow-sm p-3 text-center" style=" border-radius: 10px;">
-                    <i class="fas fa-shopping-bag text-primary" style="font-size: 2rem;"></i>
-                    <h5 class="mt-2 text-dark">Go To Shop</h5>
-                </div>
-            </a>
-
-            <% } %>
+                    <% } else { %>
+                        <!-- Empty Cart Message -->
+                        <h1 style="color: red;">Cart Is Empty</h1>
+                        <a href="/shop" class="text-decoration-none">
+                            <div class="card shadow-sm p-3 text-center" style="border-radius: 10px;">
+                                <i class="fas fa-shopping-bag text-primary" style="font-size: 2rem;"></i>
+                                <h5 class="mt-2 text-dark">Go To Shop</h5>
+                            </div>
+                        </a>
+                    <% } %>
+                    
                 <br>
-    </div><!-- End Brand Area -->
+    </div>
+    <!-- End Brand Area -->
     <%-include ("../../views/partials/user/footer") %>
 
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

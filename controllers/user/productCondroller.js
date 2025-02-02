@@ -74,29 +74,28 @@ const productDetails = async (req, res) => {
 
 const getCart = async (req, res) => {
     try {
-        const userId = req.session.user; // Get user ID from session
+        const userId = req.session.user; 
         if (!userId) {
-            return res.redirect("/login")
+            return res.redirect("/login");
         }
 
-        
         const cart = await Cart.findOne({ userId }).populate({
             path: "items.productId",
             select: "productName salePrice regularPrice productImage",
         });
 
+        if (!cart || cart.items.length === 0) {
+            return res.render("cart", { cart: null, message: "No products in cart." });
+        }
 
-
-
-
-       
-        res.render("cart", { cart: cart })
+        res.render("cart", { cart });
 
     } catch (error) {
         console.error("Error fetching cart:", error);
         res.status(500).json({ message: "Error fetching cart" });
     }
 };
+
 
 
 
