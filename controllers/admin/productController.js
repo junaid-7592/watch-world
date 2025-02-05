@@ -44,41 +44,16 @@ const addproducts = async (req, res) => {
                     imagePaths.push(cldRes.secure_url)
                 }
             }
-            // const images = [];
-            // if (req.files && req.files.length > 0) {
-            //     for (let i = 0; i < req.files.length; i++) {
-            //         const originalImagePath = req.files[i].path; // Original uploaded file path
-
-            //         // Generate resized image path
-            //         const resizedImagePath = path.join(
-            //             __dirname,
-            //             "..",
-            //             "..",
-            //             "public",
-            //             "uploads",
-            //             "product-images",
-            //             `resized-${req.files[i].filename}`
-            //         );
-
-            //         // Resize the image using Sharp
-            //         await sharp(originalImagePath)
-            //             .resize({ width: 440, height: 440 }) // Ensure correct syntax for width and height
-            //             .toFile(resizedImagePath);
-
-            //         images.push(`resized-${req.files[i].filename}`); // Add filename to the images array
-            //     }
-            // }
-
-            // Find the category ID
+           
             const categoryId = await Category.findOne({ name: products.category });
 
             if (!categoryId) {
                 return res.status(400).json({ message: "Invalid category name" });
             }
 
-            // Create a new product
+            
             const newProduct = new Product({
-                productName: products.productName, // Ensure correct capitalization of `productName`
+                productName: products.productName, 
                 description: products.description,
                 category: categoryId._id,
                 regularPrice: products.regularPrice,
@@ -91,11 +66,11 @@ const addproducts = async (req, res) => {
                 status: 'Available',
             });
 
-            // Save the product to the database
+            
             await newProduct.save();
             return res.status(200).json({success: true})
         } else {
-            // Product already exists
+        
             return res.status(400).json({ message: "Product already exists, please try with another name" });
         }
     } catch (error) {
@@ -209,12 +184,6 @@ const editProduct = async (req, res) => {
 
         const images = [];
 
-        // if (req.files && req.files.length > 0) {
-        //     for (let i = 0; i < req.files.length; i++) {
-        //         images.push(req.files[i].filename)
-        //     }
-
-        // }
            
         const updateFields = {
             productName: data.productName,
@@ -230,10 +199,7 @@ const editProduct = async (req, res) => {
 
 
 
-        // if (req.files.length > 0) {
-        //     updateFields.$push = { productImage: { $each: images } };
-        // }
-
+        
         const newData = await Product.findByIdAndUpdate(id, updateFields, { new: true });
         // console.log("======================================"+newData)
         res.redirect("/admin/products");

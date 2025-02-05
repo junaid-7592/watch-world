@@ -53,13 +53,14 @@ app.set("views",[
 ]) 
 
 app.use(express.static(path.join(__dirname, "public")));
+app.use("/profile", express.static(path.resolve(__dirname, "public")));
 
 // Use routers
 app.use(userlog) 
      
 
 app.use("/", userRouter);
-app.use("/admin",adminRouter);
+app.use("/admin",adminRouter);  
  
 app.listen(process.env.PORT, () => {      
   console.log(process.env.LOCAL_HOST);

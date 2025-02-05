@@ -25,18 +25,18 @@ const userSchema=new Schema({
     }, 
     password:{
         type:String,
-        required:false    //becouse while  single sign up  not use password
+        required:false   
     },
     isBlocked:{
         type:Boolean,  
-        default:false,     //   admin can  block  user
+        default:false,    
     },
     isAdmin:{
         type:Boolean,
-        default:false,   // user is not an admin consider only regular user
+        default:false,  
     },
     cart:[{
-        type:Schema.Types.ObjectId,  //this cart refers to another collections
+        type:Schema.Types.ObjectId,  
         ref:"Cart", 
        }] ,
     wallet:{

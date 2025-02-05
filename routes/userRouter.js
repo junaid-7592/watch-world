@@ -90,12 +90,12 @@ router.get("/productinfo",productController.productDetails)
 router.get("/profile",auth.userAuth,profileController.userProfile)
 
 
-router.get("/change-password",auth.userAuth,profileController.changePassword)
+router.get("/profile/change-password",auth.userAuth,profileController.changePassword)
 router.post("/change-password",auth.userAuth,profileController.changePasswordValid)
 
 router.post("/passwordResendOtp",auth.userAuth,profileController.passwordResendOtp)
 
-
+ 
 router.post("/conformation-forgotpass",auth.userAuth,profileController.coformationForgotpassword)
 
 
@@ -104,7 +104,14 @@ router.get("/addAddress",auth.userAuth,profileController.addAddress)
 router.post("/addAddress",auth.userAuth,profileController.postAddAddress)
 router.get("/editAddress",auth.userAuth,profileController.editAddress)   
 router.post("/editAddress",auth.userAuth,profileController.postEditAddress)   
-router.get("/deleteAddress",auth.userAuth,profileController.deleteAddress)   
+ 
+
+ 
+router.delete("/deleteAddress", auth.userAuth, profileController.deleteAddress);
+
+
+
+
 router.get("/addAddressFromcheckout",auth.userAuth,profileController.addresspageShow)
 router.post("/addAddressFromcheckout",auth.userAuth,profileController.postaddressAdd)
     

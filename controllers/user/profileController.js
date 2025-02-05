@@ -69,57 +69,17 @@ const getForgotPassPage=async(req,res)=>{
 }
 
 
-// const forgotEmailValid=async(req,res)=>{
-//     try {
-//       const {email}=req.body;
-//       console.log(email, "from forgotEmail valid" )
-//             const findUser=await User.findOne({email:email})  
-//       if(findUser){
-
-//         const otp=generateOtp();
-//       //otp ye emailott passcheyunnu
-//         const emailSend=await sendVerificationEmail(email,otp);
-//         if(emailSend){
-//             // user enter cheytha OTP session lot assign cheyyanam
-//             req.session.userOtp=otp;
-//             console.log(req.session.userOtp, "from otp session   seesion nil kayatti")
-//             req.session.userOtp=email;
-//             res.render("forgotPass-otp",{message:null});
-//         }else{
-//           res.render("forgot-Password", {
-//                     message: "Failed to send OTP. Please try again."||null, // Error message pass cheyyunnu
-//                                })  
-//         }
-
-//             console.log("send OTP:..",otp);
-//         // }else{
-//         //     res.json({success:false,message:"Failed To Send OTP please try again"})
-//         // }
-
-//       }else{
-//         res.render("forgot-password",{
-//             message:"User with ithis email does not exist"
-        
-//         });
-//         // console.log("kooooooooooooooooooooooooi")
-//       }
-//     } catch (error) {
-//         res.redirect("/pageNotFound");
-        
-//     }
-// }
-
 
 const forgotEmailValid = async (req, res) => {
   try {
     const { email } = req.body;
     console.log(email, "from forgotEmailValid");
 
-    // Check if user exists with the provided email
+    
     const findUser = await User.findOne({ email: email });
 
     if (findUser) {
-      // Generate OTP
+      
       const otp = generateOtp();
 
       // Send OTP via email
@@ -207,7 +167,7 @@ const userProfile=async(req,res)=>{
     const userData=await User.findById(userId)
     const AddressData=await Address.findOne({userId : userId});
     const orders = await Order.find({userId})
-    console.log( " this order details of ",orders)
+    // console.log( " this order details of ",orders)
 
     console.log(orders)
      res.render('profile',{
@@ -272,27 +232,6 @@ const changePasswordValid=async (req,res) => {
       res.status(500).send('Internal server error');
     }
    }
-
-
-// const verifyOtpChangePasswordPage=async(req,res)=>{
-// try {
-//   const { otp } = req.body; 
-//   console.log("Input OTP:", otp);
-
-//   if (otp === req.session.userOtp) { 
-      
-//   req.session.userOtp=otp;
-//     res.render("changepasswordPage");
-
-//  } else {
-//       res.status(400).json({ success: false, message: "Invalid OTP, please try again" });
-//       // console.log("invalidotp")
-//   }
-// } catch (error) {
-//   console.error("Error Verifying OTP:", error);
-//   res.status(500).json({ success: false, message: "An error occurred" });
-// }
-// };
 
 
 
@@ -419,39 +358,109 @@ const editAddress=async(req,res)=>{
   }
 }
    
-const postEditAddress=async(req,res)=>{
-try {
-  const data=req.body;
-  const addressId=req.query.id;
-  const user=req.session.user;
-  const findAddress=await Address.findOne({"address._id":addressId});
-  if(!findAddress){
-    res.redirect("pageNotFound")
-  }
-  await Address.updateOne(
-    {"address._id":addressId} ,
-    {$set :{
-      "address.$":{
-        _id:addressId,
-        addressType:data.addressType,
-        name:data.name,
-        city:data.city,
-        landMark:data.landMark,
-        state:data.state,
-        pincode:data.pincode,
-        phone:data.phone,
-        altPhone:data.altPhone,
-       }
-    }}
+// const postEditAddress=async(req,res)=>{
+// try {
+//   const data=req.body;
+//   const addressId=req.query.id;
+//   const user=req.session.user;
+//   const findAddress=await Address.findOne({"address._id":addressId});
+//   if(!findAddress){
+//     res.redirect("pageNotFound")
+//   }
+//   await Address.updateOne(
+//     {"address._id":addressId} ,
+//     {$set :{
+//       "address.$":{
+//         _id:addressId,
+//         addressType:data.addressType,
+//         name:data.name,
+//         city:data.city,
+//         landMark:data.landMark,
+//         state:data.state,
+//         pincode:data.pincode,
+//         phone:data.phone,
+//         altPhone:data.altPhone,
+//        }
+//     }}
     
-   )
-  res.redirect("/profile")
+//    )
+//   res.redirect("/profile")
 
-} catch (error) {
- console.error("Error in edit address",error) 
- res.redirect("/pageNotFound")
-}
-}
+// } catch (error) {
+//  console.error("Error in edit address",error) 
+//  res.redirect("/pageNotFound")
+// }
+// }
+
+
+
+const postEditAddress = async (req, res) => {
+  try {
+      const data = req.body;
+      const addressId = req.query.id;
+      const user = req.session.user;
+
+      if (!user) {
+          return res.status(401).json({ success: false, message: "Unauthorized access" });
+      }
+
+      // Validate fields
+      if (!data.addressType || !data.name || !data.city || !data.landMark || !data.state || !data.pincode || !data.phone || !data.altPhone) {
+          return res.status(400).json({ success: false, message: "All fields are required." });
+      }
+
+      if (!/^\d{6}$/.test(data.pincode)) {
+          return res.status(400).json({ success: false, message: "Pincode must be 6 digits." });
+      }
+
+      if (!/^\d{10}$/.test(data.phone)) {
+          return res.status(400).json({ success: false, message: "Phone number must be 10 digits." });
+      }
+
+      if (!/^\d{10}$/.test(data.altPhone)) {
+          return res.status(400).json({ success: false, message: "Alternate phone number must be 10 digits." });
+      }
+
+      // Find and update the address
+      const findAddress = await Address.findOne({ "address._id": addressId });
+
+      if (!findAddress) {
+          return res.status(404).json({ success: false, message: "Address not found" });
+      }
+
+      const updateResult = await Address.updateOne(
+          { "address._id": addressId },
+          {
+              $set: {
+                  "address.$": {
+                      _id: addressId,
+                      addressType: data.addressType,
+                      name: data.name,
+                      city: data.city,
+                      landMark: data.landMark,
+                      state: data.state,
+                      pincode: data.pincode,
+                      phone: data.phone,
+                      altPhone: data.altPhone,
+                  }
+              }
+          }
+      );
+
+      if (updateResult.modifiedCount === 0) {
+          return res.status(400).json({ success: false, message: "Failed to update address" });
+      }
+
+      res.json({ success: true });
+
+  } catch (error) {
+      console.error("Error in edit address:", error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+
+
 
 const orderViewLoad = async (req, res) => {
   try {
@@ -470,25 +479,86 @@ const orderViewLoad = async (req, res) => {
 };
 
 
-const deleteAddress=async(req,res)=>{
+// const deleteAddress=async(req,res)=>{
+//   try {
+//  const addressId=req.query.id;
+//  const findAddress=await Address.findOne({"address._id":addressId});
+//  if(!findAddress){
+//   return res.status(400).send("address not found")
+//  }  
+
+//  await Address.updateOne({
+//   "address._id":addressId,
+
+//  },{$pull:{address:{_id:addressId,}}})
+//  res.redirect("/profile")
+
+//   } catch (error) {
+//    console.error("Error in delete address",error) 
+//    res.redirect("pageNotFound")
+//   }
+// }
+
+     
+
+
+// const deleteAddress = async (req, res) => {
+//   try {
+//     const addressId = req.query.id;
+//     console.log("8888888888888111111",addressId)
+     
+//     if (!addressId) {
+//       return res.status(400).json({ success: false, message: "Address ID is required" });
+//     }
+
+//     // Find if the address exists inside the user document
+//     const findAddress = await Address.findOne({ "address._id": addressId });
+
+//     if (!findAddress) {
+//       return res.status(404).json({ success: false, message: "Address not found" });
+//     }
+
+//     // Remove the address from the array
+//     await Address.updateOne(
+//       { "address._id": addressId },
+//       { $pull: { address: { _id: addressId } } }
+//     );
+
+//     return res.json({ success: true, message: "Address deleted successfully" });
+
+//   } catch (error) {
+//     console.error("Error in delete address:", error);
+//     return res.status(500).json({ success: false, message: "Internal server error" });
+//   }
+// };
+const deleteAddress = async (req, res) => {
   try {
- const addressId=req.query.id;
- const findAddress=await Address.findOne({"address._id":addressId});
- if(!findAddress){
-  return res.status(400).send("address not found")
- }  
+    const addressId = req.query.id;
 
- await Address.updateOne({
-  "address._id":addressId,
+    if (!addressId) {
+      return res.status(400).json({ success: false, message: "Address ID is required" });
+    }
 
- },{$pull:{address:{_id:addressId,}}})
- res.redirect("/profile")
+    const findAddress = await Address.findOne({ "address._id": addressId });
+
+    if (!findAddress) {
+      return res.status(404).json({ success: false, message: "Address not found" });
+    }
+
+    await Address.updateOne(
+      { "address._id": addressId },
+      { $pull: { address: { _id: addressId } } }
+    );
+
+    return res.json({ success: true, message: "Address deleted successfully" });
 
   } catch (error) {
-   console.error("Error in delete address",error) 
-   res.redirect("pageNotFound")
+    console.error("Error in delete address:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
   }
-}
+};
+
+
 
 const addresspageShow=async(req,res)=>{
   try {

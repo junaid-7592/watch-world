@@ -1,33 +1,6 @@
-// const User=require("../../models/userSchema")
-// const product=require("../../models/productSchema")
 
 
-// const productDetails = async (req, res) => {
-//     try {
 
-//       const user = req.session.user;
-//       const userData = await User.findOne({ _id: user });
-//         const productId = req.query.id;
-
-//         if (!productId) {
-//             console.error("Product ID is missing from request.");
-//             return res.redirect('/pageNotFound');
-//         }
-
-
-//         res.render("productInfo")
-
-
-//     } catch (error) {
-//         console.error("Error in productDetails:", error);
-//         res.redirect('/pageNotFound');
-//     }
-//   };
-
-
-//   module.exports={
-//     productDetails ,
-//   }
 
 
 
@@ -104,20 +77,20 @@ const addTocart = async (req, res) => {
     const userId = req.session.user;
     try {
         const { productId, quantity } = req.body;
-        // console.log("this is userId", userId);
-        // console.log("this is productId", productId);
-        // console.log("this is quantity", quantity);
 
-        // Fetch product details (including price)
+        console.log(productId,quantity)
+       
         const product = await Product.findById(productId);
         if (!product) {
         
            return res.json({ success: true, message: "product not found" });
 
+
+           
         }
         const price = product.salePrice || product.regularPrice; // Use salePrice if available, otherwise use regularPrice
         // console.log("price is", price);
-        // Ensure your Product model has a price field
+        
         // console.log("price  is", price)
 
         let cart = await Cart.findOne({ userId });
@@ -129,7 +102,12 @@ const addTocart = async (req, res) => {
         const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
         // console.log("3", itemIndex);
         if (itemIndex > -1) {
+            if(cart.items[itemIndex].quantity+quantity<=5){         
+            }else{
+              return  res.json({ success: false, message: "canot added  greatertahn 5 product", cart });   
+            }
             cart.items[itemIndex].quantity += quantity;
+            
         } else {
             cart.items.push({ productId, quantity, price }); // Add price here
         }
@@ -141,43 +119,43 @@ const addTocart = async (req, res) => {
         console.error("Error in addToCart:", error);
         res.status(500).json({ message: "Error adding to cart" });
     }
+
 };
 
 const cartUpdate = async (req, res) => {
-    const { itemId } = req.params;  // Extract itemId from URL params
-    const { quantity } = req.body;  // Extract quantity from request body
+    const { itemId } = req.params;  
+    const { quantity } = req.body;  
 
     if (!quantity || quantity < 1) {
         return res.status(400).json({ success: false, message: "Invalid quantity" });
     }
 
     try {
-        // Find and update the cart item quantity
         const updatedCart = await Cart.findOneAndUpdate(
             { 'items._id': itemId },
             { $set: { 'items.$.quantity': quantity } },
-            { new: true } // Return the updated cart
+            { new: true }
         );
 
         if (!updatedCart) {
             return res.status(404).json({ success: false, message: "Cart not found" });
         }
 
-        // Find the updated item
+       
         const updatedItem = updatedCart.items.find(item => item._id.toString() === itemId);
         if (!updatedItem) {
             return res.status(404).json({ success: false, message: "Item not found in cart" });
         }
 
-        // Calculate the updated total price
+        
         const updatedPrice = (updatedItem.price * updatedItem.quantity).toFixed(2);
 
-        // Respond with the updated item details
+        
         res.json({
             success: true,
             item: {
-                ...updatedItem.toObject(), // Convert to plain object
-                total: updatedPrice       // Include the total price
+                ...updatedItem.toObject(), 
+                total: updatedPrice      
             }
         });
 
@@ -257,15 +235,11 @@ const getCheckout = async (req, res) => {
     try {
 
         const userId = req.session.user;    
-        // console.log(userId)
         const addressData = await Address.find({ userId }).populate("address")
-        // console.log(addressData)
 
 
-        // Fetch user's cart items
         const cart = await Cart.findOne({ userId }).populate("items.productId");
 
-        // console.log('this is cart',cart)
 
         if (!cart) {
             return res.status(404).send("User or Cart not found");
@@ -285,15 +259,7 @@ const getCheckout = async (req, res) => {
 const OrderSuccess = async (req, res) => {
     try {
         const { userId, cartId, selectedAddress,paymentMethod } = req.body;
-        // console.log("dfghofdfgiodfg",paymentMethod)
-        // console.log(req.body);
-        
-        
-        // console.log("User ID:", userId);
-        // console.log("Cart ID:", cartId);
-        //   adresss = find(addresssId)
-         //  
-        // (1) **User ID Validation**
+       
         if (!userId || typeof userId !== 'string' || userId.trim().length === 0) {
             return res.status(400).json({ success: false, message: "use valid user ID ." });
         }
@@ -369,7 +335,7 @@ const OrderSuccess = async (req, res) => {
 
     } catch (error) {
         console.error("Error:", error);
-        res.status(500).json({ success: false, message: "Internal Server Error" });
+        res.status(500).json({ success: false, message: "Please Select Payment Method" });
     }
 };
 
@@ -405,9 +371,9 @@ const getOrderSuccess = async (req, res) => {
 const cancelOrder= async (req, res) => {
     try {
         const { orderId } = req.params;
-        console.log("111111.canselation id:",orderId)
+        // console.log("111111.canselation id:",orderId)
         const order = await Order.findById(orderId);
-        console.log("2222222.canselation:",order)
+        // console.log("2222222.canselation:",order)
         if (!order) {
             return res.status(404).json({ success: false, message: "Order not found" });
         }

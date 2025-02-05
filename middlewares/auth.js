@@ -4,19 +4,23 @@
 
 
   const userAuth=(req,res,next)=>{
-    if(req.session.user){   //if have user
-        User.findById(req.session.user)  //databasil user undo? 
-        .then(data=>{                        //promise use cheyth
+    if(req.session.user){   
+        User.findById(req.session.user)  
+        .then(data=>{                        
             if(data && !data.isBlocked){    
                 next();
             }else{
+                if(req.locals){
+                    req.locals.userCredit = false
+                }
                 res.redirect("/login")
             }
         })
         .catch(error=>{
+            console.log(error)
             console.log("Error in user auth middleware");
             res.status(500).send("Internal Server error ")
-        })
+        }) 
     }else{
         res.redirect("/")
     }

@@ -44,32 +44,100 @@
    </form>
 </div>
 
-
 <script>
-   document.getElementById('submitButton').addEventListener('click', function (event) {
+   document.getElementById('addressForm').addEventListener('submit', async function (event) {
+       event.preventDefault();
        if (!validateForm()) {
-           event.preventDefault();
+           return;
+       }
+
+       const formData = new FormData(this);
+       const queryString = new URLSearchParams(formData).toString();
+       const actionUrl = this.action;
+
+       try {
+           const response = await fetch(actionUrl, {
+               method: "POST",
+               body: formData
+           });
+
+           const result = await response.json();
+
+           if (result.success) {
+               Swal.fire({
+                   title: 'Success',
+                   text: 'Address updated successfully!',
+                   icon: 'success'
+               }).then(() => {
+                   window.location.href = "/profile";
+               });
+           } else {
+               Swal.fire({
+                   title: 'Error',
+                   text: result.message,
+                   icon: 'error'
+               });
+           }
+       } catch (error) {
+           Swal.fire({
+               title: 'Error',
+               text: 'Something went wrong. Please try again later.',
+               icon: 'error'
+           });
        }
    });
-
 
    function validateForm() {
        let isValid = true;
        const requiredFields = ["addressType", "name", "city", "landMark", "state", "pincode", "phone", "altPhone"];
-       requiredFields.forEach(function (field) {
+
+       for (let field of requiredFields) {
            const input = document.getElementById(field);
            if (input.value.trim() === "") {
                Swal.fire({
                    title: 'Error',
-                   text: `Please fill all the field.`,
+                   text: `Please fill out all fields.`,
                    icon: 'error'
                });
-               isValid = false;
+               return false;
            }
-       });
+       }
 
+       // Phone number validation (10 digits)
+       const phone = document.getElementById("phone").value.trim();
+       if (!/^\d{10}$/.test(phone)) {
+           Swal.fire({
+               title: 'Error',
+               text: 'Phone number must be 10 digits.',
+               icon: 'error'
+           });
+           return false;
+       }
 
-       return isValid;
+       // Alternate phone validation (10 digits)
+       const altPhone = document.getElementById("altPhone").value.trim();
+       if (!/^\d{10}$/.test(altPhone)) {
+           Swal.fire({
+               title: 'Error',
+               text: 'Alternate phone number must be 10 digits.',
+               icon: 'error'
+           });
+           return false;
+       }
+
+       // Pincode validation (6 digits)
+       const pincode = document.getElementById("pincode").value.trim();
+       if (!/^\d{6}$/.test(pincode)) {
+           Swal.fire({
+               title: 'Error',
+               text: 'Pincode must be 6 digits.',
+               icon: 'error'
+           });
+           return false;
+       }
+
+       return true;
    }
 </script>
+
 <%- include("../../views/partials/user/footer") %>

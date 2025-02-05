@@ -710,18 +710,27 @@
 
         <script>
             function addToCart(productId) { // Add to Cart function
+                const quantity = parseInt(document.querySelector('.quantity-input').value);
                 fetch('/cart/add', { // API call cheyyunnu
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ productId: productId, quantity: 1 }) // User ID & Product ID send cheyyunnu
+                    body: JSON.stringify({ productId: productId, quantity }) // User ID & Product ID send cheyyunnu
                 })
                     .then(response => response.json()) // Response JSON akki edukkunnu
                     .then(data => {
-                        Swal.fire({
-                            title: "Success!",
-                            text: data.message,
-                            icon: "success",
-                        });
+                        if (data.success) {
+                            Swal.fire({
+                                title: "Success!",
+                                text: data.message,
+                                icon: "success",
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Oops...",
+                                text: data.message,
+                            });
+                        }
 
                     })
                     .catch(error => console.error("Error:", error)); // Error handle cheyyunnu

@@ -396,9 +396,21 @@
 														</div>
 														<!-- Single Product Actions -->
 														<div class="product-actions">
-															<button class="button btn-cart" title="Add to Cart" type="button">
+
+
+															<!-- <button class="button btn-cart" title="Add to Cart" type="button">
+																<i class="fa fa-shopping-cart">&nbsp;</i><span>Add to Cart</span>
+															</button> -->
+
+
+
+															<button class="button btn-cart" id="addToCart" onclick="addToCart('<%= prod._id %>') ">
 																<i class="fa fa-shopping-cart">&nbsp;</i><span>Add to Cart</span>
 															</button>
+
+
+
+
 															<div class="add-to-link">
 																<ul>
 																	<li class="quic-view">
@@ -469,6 +481,7 @@
 				  <script src="assets/js/plugins.js"></script>
 			  
 				  <!-- Main JS -->
+				  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 				  <script src="assets/js/main.js"></script>
 			  	<script>
 					function applySorting() {
@@ -522,5 +535,50 @@ function updateProductList(products) {
     });
 }
 
-					
-					</script>
+</script>
+
+
+<script>
+	function addToCart(productId) {
+    const quantity = 1; // Default quantity
+
+    fetch("/cart/add", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ productId, quantity }) // Send product ID and quantity
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                icon: "success",
+                title: "Added Successfully!",
+                text: "Product has been added to your cart.",
+                showConfirmButton: false,
+                timer: 1500
+            });
+        } else {
+            Swal.fire({
+                icon: "error",
+                title: "Failed to Add!",
+                text: data.message,
+                showConfirmButton: false,
+                timer: 1500
+            });
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        Swal.fire({
+            icon: "error",
+            title: "Error!",
+            text: "Could not connect to the server.",
+            showConfirmButton: false,
+            timer: 1500
+        });
+    });
+}
+
+	</script>

@@ -118,9 +118,9 @@
 						<div class="single-product-tab custom-tab">
 							<!-- Tabs Bar -->
 							<ul class="nav nav-tabs" role="tablist">
-								<li><a class="active" href="#bestseller" data-bs-toggle="tab">Bestseller Products</a></li>
-								<li><a href="#most-viewed" data-bs-toggle="tab">Most Viewed Products</a></li>
-								<li><a href="#random" data-bs-toggle="tab">Random Products</a></li>
+								<!-- <li><a class="active" href="#bestseller" data-bs-toggle="tab">Bestseller Products</a></li> -->
+								<!-- <li><a href="#most-viewed" data-bs-toggle="tab">Most Viewed Products</a></li> -->
+								<!-- <li><a href="#random" data-bs-toggle="tab">Random Products</a></li> -->
 							</ul><!-- End Tabs Bar -->
 							<!-- Tab Content-->
 							<div class="tab-content">
@@ -161,7 +161,15 @@
 												<!-- Single Product Actions -->
 												 
 												<div class="product-actions">
-													<button class="button btn-cart" title="Add to Cart" type="button"><i class="fa fa-shopping-cart">&nbsp;</i><span>Add to Cart</span></button>
+													<button class="button btn-cart" onclick="addToCart('<%= products[i]._id %>') " title="Add to Cart" type="button"><i class="fa fa-shopping-cart">&nbsp;</i><span>Add to Cart</span></button>
+
+		
+
+
+													
+
+
+
 													<div class="add-to-link">
 														<ul class="">
 															
@@ -952,6 +960,52 @@
 				</div>
 			</div>
 		</div><!-- End Single Product Area -->
+		<script>
+			function addToCart(productId) {
+			const quantity = 1; // Default quantity
+		
+			fetch("/cart/add", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify({ productId, quantity }) // Send product ID and quantity
+			})
+			.then(response => response.json())
+			.then(data => {
+				if (data.success) {
+					Swal.fire({
+						icon: "success",
+						title: "Added Successfully!",
+						text: "Product has been added to your cart.",
+						showConfirmButton: false,
+						timer: 1500
+					});
+				} else {
+					Swal.fire({
+						icon: "error",
+						title: "Failed to Add!",
+						text: data.message,
+						showConfirmButton: false,
+						timer: 1500
+					});
+				}
+			})
+			.catch(error => {
+				console.error("Error:", error);
+				Swal.fire({
+					icon: "error",
+					title: "Error!",
+					text: "Could not connect to the server.",
+					showConfirmButton: false,
+					timer: 1500
+				});
+			});
+		}
+		
+			</script>
+							  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
 		
 		<%-include ("../../views/partials/user/footer") %> 

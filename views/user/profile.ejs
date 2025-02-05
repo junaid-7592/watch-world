@@ -2,10 +2,9 @@
 
 <%-include ("../../views/partials/user/header") %>
 
-<!-- Bootstrap CSS -->
-<!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQtbXWxNtdlEy8FA7CgK6m3P9bL2VxJ0J4eIT5LTbER2CWYg3iMkhfNuQ" crossorigin="anonymous"> -->
 
-<!-- Bootstrap Bundle with JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b2PtHT1a3x2L42YZwKbQIKMofwzMCFHE4DvhMeQiUTjAvQwVAXdFOvLpR4lmVxw+" crossorigin="anonymous"></script>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
@@ -255,11 +254,17 @@
                          <p><%=address.altPhone%></p>
 
 
-                         <div class="d-flex justify-content-between">
+                         <!-- <div class="d-flex justify-content-between">
                            <a href="/editAddress?id=<%=address._id%>" class="btn-small">Edit</a>
                            <a href="/deleteAddress?id=<%=address._id%>" class="btn-small" onclick="return confirm('are you sure you want to delete this address?')">Delete</a>
-                         </div>
+                         </div>  
+                         -->
                         
+                         <div class="d-flex justify-content-between">
+                          <a href="/editAddress?id=<%= address._id %>" class="btn-small">Edit</a>
+                          <button class="btn-small delete-btn" data-id="<%= address._id %>">Delete</button>
+                        </div>
+
                        </div>
                      </div>
                    </div>
@@ -397,10 +402,47 @@
  </section>
 </main>
 <%-include ("../../views/partials/user/footer") %>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".delete-btn").forEach((btn) => {
+      btn.addEventListener("click", async function () {
+        const addressId = this.getAttribute("data-id");
 
+        const confirmDelete = await Swal.fire({
+          title: "Are you sure?",
+          text: "You won't be able to revert this!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#3085d6",
+          confirmButtonText: "Yes, delete it!",
+        });
 
+        if (!confirmDelete.isConfirmed) return;
+
+        try {
+          const response = await fetch(`/deleteAddress?id=${addressId}`, {
+            method: "DELETE",
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            Swal.fire("Deleted!", result.message, "success").then(() => {
+              location.reload();
+            });
+          } else {
+            Swal.fire("Error!", result.message, "error");
+          }
+        } catch (error) {
+          Swal.fire("Error!", "Something went wrong.", "error");
+        }
+      });
+    });
+  });
+</script>
 
 
 
     
-     
+    
