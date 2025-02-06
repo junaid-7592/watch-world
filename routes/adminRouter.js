@@ -61,7 +61,12 @@ router.get("/viewOrderdetails/:id",adminAuth,orderController.getViewOrderdetails
 router.put("/orders/update-status/:orderId", adminAuth, orderController.updateStatus);  // fetch(`/update-status/orders/${orderId}/
 router.put("/orders/cancel-status/:orderId",adminAuth,orderController.canselOrder)
 
+router.get("/coupenManagmentlist",adminAuth,adminController.coupenManagmentListget);
+router.get("/addCoupon",adminAuth,adminController.addNewCoupon)
+router.post("/coupons",adminAuth,adminController.newCouponAdd)
 
+router.get("/updateCoupon/:id",adminAuth,adminController.lodeUpdateCoupon)
+router.put("/admin/Updatecoupons",adminAuth,adminController.updateCoupon)
 
 
 module.exports=router;

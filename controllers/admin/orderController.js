@@ -1,7 +1,8 @@
 const Order=require("../../models/orderSChema")
 const User = require("../../models/userSchema")
 const mongoose=require("mongoose");
-
+const Razorpay = require("razorpay");
+require("dotenv").config();
 
 
 const showOrderList = async (req, res) => {
@@ -84,6 +85,7 @@ const canselOrder=async(req,res)=>{
 }
 }
 
+  
 
 
 module.exports = {

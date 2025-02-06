@@ -3,7 +3,7 @@
 
 
 
-
+const Razorpay = require("razorpay");
 const User = require("../../models/userSchema");
 const mongoose = require("mongoose");
 const Product = require("../../models/productSchema");
@@ -394,6 +394,30 @@ const cancelOrder= async (req, res) => {
     }
 };
 
+const razorpay = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY,
+    key_secret: process.env.RAZORPAY_SECRET,
+  });
+
+  const CreateOrderRazaorpay= async (req, res) => {
+    const options = {
+      amount: req.body.amount * 100, // Amount in paise (INR 100 = 10000)
+      currency: "INR",
+      receipt: "order_rcptid_11",
+
+      payment_capture: 1, // Auto capture
+    };
+  
+    try {
+      const order = await razorpay.orders.create(options);
+      
+      res.json(order);
+    } catch (error) {
+        console.log(error)
+      res.status(500).json({ error: error.message });
+    }
+  };
+
 
 
 
@@ -410,4 +434,6 @@ module.exports = {
     OrderSuccess,
     getOrderSuccess,
     cancelOrder,
+    
+    CreateOrderRazaorpay,
 };

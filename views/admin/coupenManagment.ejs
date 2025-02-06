@@ -1,0 +1,160 @@
+<!-- <!DOCTYPE html> -->
+<!-- <html lang="en">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coupon Management</title> -->
+    <%- include("../../views/partials/admin/header") %>
+    <head> 
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            padding: 1px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .add-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .add-btn:hover {
+            background-color: #45a049;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .active {
+            background-color: #e3fcef;
+            color: #00864e;
+        }
+
+        .inactive {
+            background-color: #fce3e3;
+            color: #860000;
+        }
+
+        
+
+        .update-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .update-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+
+            
+
+          
+            <h1>Coupon Management</h1>
+            <!-- <button class="add-btn">Add New Coupon</button> -->
+            <a href="/admin/addCoupon" class="add-btn">Add New Coupon</a>
+        </div>
+        <table>
+            <thead>
+                
+
+                <tr>
+                    <th>No</th>
+                    <th>Coupon Code</th>
+                    <th>Discount</th>
+                    <th>Min Purchase</th>
+                    <th>Dates</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+
+
+                <% Coupons.forEach((items,index)=>{%>
+                <tr>
+                    <td><%=index+1%></td>
+                    <td><%=items.code%></td>
+                    <% if (items.discountType=='percentage') { %>
+                        <td><%=items.discountValue%>%</td>
+                        <% } else { %>
+                        <td><%=items.discountValue%></td>
+                         
+                        <% } %>
+                        <td>₹<%=items.minPurchase%></td>
+                        
+                    <td><small style="display: block;">startDate: <%= new Date(items.startDate).toLocaleDateString() %></small>
+                        <small style="display: block;">endDate: <%= new Date(items.endDate).toLocaleDateString() %></small></td>
+                        <% if (items.isActive ==='Active') { %>
+                         <td><span class="status active"><%= items.isActive %></span></td>
+                         <% } else { %>
+                         <td><span class="status inactive"><%= items.isActive %></span></td>
+                        <% } %>
+                        <td>
+                            <a href="/admin/updateCoupon/<%= items._id %>">
+                                <button class="update-btn" >update</button>
+                            </a>
+                        </td>
+                </tr>
+                <% }) %>
+
+                <!-- Add more rows as needed -->
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
+<%- include("../../views/partials/admin/footer") %>

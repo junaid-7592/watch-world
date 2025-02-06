@@ -195,12 +195,13 @@
                 <div>
                     <span class="order-status"><%= order.status %></span>
                 
-                    <% if (order.status !== "Delivered") { %>
-                        <span class="payment-status" style="color: red;">Unpaid</span>
-                    <% } else { %>
+                    <% if (order.status === "Delivered" || order.paymentMethod === "onlinepayment") { %>
                         <span class="payment-status" style="color: green;">Paid</span>
+                    <% } else { %>
+                        <span class="payment-status" style="color: red;">Unpaid</span>
                     <% } %>
                 </div>
+                
                 
                
             </div>

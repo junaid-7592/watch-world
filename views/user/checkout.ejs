@@ -207,6 +207,7 @@
         </div>
     </div>
 
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <!-- <script>
@@ -217,6 +218,7 @@
       
 
 <script>
+
 
 function getSelectedAddress() {
     return document.querySelector('input[name="address"]:checked')?.value;
@@ -229,19 +231,73 @@ function getpaymentMethod(){
 
 
 
+// async function placeOrder(cartId, userId) {
+//     let selectedAddress = getSelectedAddress();
+//     let paymentMethod = getpaymentMethod()
+//     console.log(paymentMethod);
+    
+   
+    
+    
+//     if (!selectedAddress) {
+//         swal({
+//             title: "No Address Selected",
+//             text: "Please select an address before placing an order.",
+//             icon: "warning",
+//             button: "OK"
+//         });
+//         return;
+//     }
+
+//     try {
+//         fetch('/orderSuccess', {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json'
+//             },
+//             body: JSON.stringify({ cartId, userId, selectedAddress,paymentMethod })
+//         })
+//         .then(response => response.json()) 
+//         .then(result => {
+//             if (result.success) {
+//                 swal({
+//                     title: "Order Placed!",
+//                     text: "Your order has been placed successfully.",
+//                     icon: "success",
+//                     button: "OK"
+//                 }).then(() => {
+//                     const orderId = result.orderId
+//                     console.log(orderId);
+                    
+//                     window.location.href = `/orderSuccess?orderId=${orderId}`;   //enna rute ilott pokan
+//                 });
+//             } else {
+//                 swal({
+//                     title: "Order Failed",
+//                     text: `Error: ${result.message}`,
+//                     icon: "error",
+//                     button: "OK"
+//                 });
+//             }
+//         })
+//         .catch(error => {
+//             console.error("Error:", error);
+//             swal({
+//                 title: "Error",
+//                 text: "Error in placing order. Please try again!",
+//                 icon: "error",
+//                 button: "OK"
+//             });
+//         });
+//     } catch (error) {
+//         console.error("Unexpected Error:", error);
+//     }
+// }
+
 async function placeOrder(cartId, userId) {
     let selectedAddress = getSelectedAddress();
-    let paymentMethod = getpaymentMethod()
+    let paymentMethod = getpaymentMethod();
     console.log(paymentMethod);
-    
-    if(paymentMethod == "onlinepayment"){
-      return    swal({
-            title: "Payment",
-            text: "online payment not available",
-            icon: "warning",
-            button: "OK"
-        });
-    }
     
     if (!selectedAddress) {
         swal({
@@ -253,50 +309,136 @@ async function placeOrder(cartId, userId) {
         return;
     }
 
-    try {
-        fetch('/orderSuccess', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ cartId, userId, selectedAddress,paymentMethod })
-        })
-        .then(response => response.json()) 
-        .then(result => {
-            if (result.success) {
-                swal({
-                    title: "Order Placed!",
-                    text: "Your order has been placed successfully.",
-                    icon: "success",
-                    button: "OK"
-                }).then(() => {
-                    const orderId = result.orderId
-                    console.log(orderId);
-                    
-                    window.location.href = `/orderSuccess?orderId=${orderId}`;   //enna rute ilott pokan
-                });
-            } else {
-                swal({
-                    title: "Order Failed",
-                    text: `Error: ${result.message}`,
-                    icon: "error",
-                    button: "OK"
-                });
+    if (paymentMethod === "onlinepayment") {
+        try {
+            // Step 1: Request backend to create Razorpay order
+            let response = await fetch('/create-orderRazorpay', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({amount : 500 })  // Replace with actual amount
+            });
+
+            let orderData = await response.json();
+            if (!orderData || !orderData.id) {
+                throw new Error("Failed to create Razorpay order");
             }
-        })
-        .catch(error => {
-            console.error("Error:", error);
+
+            // Step 2: Initialize Razorpay payment options
+            let options = {
+                "key": "rzp_test_T7fmLotqdQ3Hde", // Replace with actual key
+                "amount": orderData.amount, // Amount in paisa
+                "currency": "INR",
+                "name": "Your Store",
+                "description": "Order Payment",
+                "order_id": orderData.id, // Razorpay order ID from backend
+                "handler": function (response) {
+                    // Step 3: On success, place order in backend
+                    fetch('/orderSuccess', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ 
+                            cartId, 
+                            userId, 
+                            selectedAddress, 
+                            paymentMethod,
+                            paymentId: response.razorpay_payment_id
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(result => {
+                        if (result.success) {
+                            swal({
+                                title: "Order Placed!",
+                                text: "Your order has been placed successfully.",
+                                icon: "success",
+                                button: "OK"
+                            }).then(() => {
+                                window.location.href = `/orderSuccess?orderId=${result.orderId}`;
+                            });
+                        } else {
+                            swal({
+                                title: "Order Failed",
+                                text: `Error: ${result.message}`,
+                                icon: "error",
+                                button: "OK"
+                            });
+                        }
+                    });
+                },
+                "prefill": {
+                    "name": "Customer Name", 
+                    "email": "customer@example.com",
+                    "contact": "9999999999"
+                },
+                "theme": {
+                    "color": "#3399cc"
+                }
+            };
+
+            // Step 4: Open Razorpay Payment Window
+            let rzp = new Razorpay(options);
+            rzp.open();
+        } catch (error) {
+            console.error("Razorpay Payment Error:", error);
             swal({
-                title: "Error",
-                text: "Error in placing order. Please try again!",
+                title: "Payment Error",
+                text: "Error in processing Razorpay payment. Please try again!",
                 icon: "error",
                 button: "OK"
             });
-        });
-    } catch (error) {
-        console.error("Unexpected Error:", error);
+        }
+    } else {
+        // Process normal order (COD, Wallet, etc.)
+        try {
+            fetch('/orderSuccess', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ cartId, userId, selectedAddress, paymentMethod })
+            })
+            .then(response => response.json()) 
+            .then(result => {
+                if (result.success) {
+                    swal({
+                        title: "Order Placed!",
+                        text: "Your order has been placed successfully.",
+                        icon: "success",
+                        button: "OK"
+                    }).then(() => {
+                        window.location.href = `/orderSuccess?orderId=${result.orderId}`;
+                    });
+                } else {
+                    swal({
+                        title: "Order Failed",
+                        text: `Error: ${result.message}`,
+                        icon: "error",
+                        button: "OK"
+                    });
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                swal({
+                    title: "Error",
+                    text: "Error in placing order. Please try again!",
+                    icon: "error",
+                    button: "OK"
+                });
+            });
+        } catch (error) {
+            console.error("Unexpected Error:", error);
+        }
     }
 }
+
+
+
+
 </script>
 </body>
 </html>
