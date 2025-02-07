@@ -165,7 +165,7 @@ console.log("---> newCouponAdd");
     };
 
     const lodeUpdateCoupon=async(req,res)=>{
-        console.log("----> lodeUpdateCoupon");
+        // console.log("----> lodeUpdateCoupon");
         
         try{
             if(!req.session.admin){
@@ -175,7 +175,7 @@ console.log("---> newCouponAdd");
         // console.log(id);
         
     const coupons = await Coupon.findById({_id:id})
-    console.log(coupons);
+    // console.log(coupons);
 
     return res.render('updateCoupon',{coupons})
 
@@ -193,23 +193,51 @@ console.log("---> newCouponAdd");
     const updateCoupon=async(req,res)=>{
         console.log("--->updateCoupon");
         try{
-
-            const { code, discountType, discountValue, maxDiscount, minPurchase, startDate, endDate, usageLimit, isActive } = req.body;
+            // console.log(req.body);
             
-            console.log( { code, discountType, discountValue, maxDiscount, minPurchase, startDate, endDate, usageLimit, isActive } );
+            const { code, discountType, discountValue, maxDiscount, minPurchase, startDate, endDate, usageLimit, isActive } = req.body;
 
             if (!code || !discountType || !discountValue || !minPurchase || !startDate || !endDate || !usageLimit || !isActive) {
                 return res.status(400).json({ success: false, message: 'All fields are required.' });
             }
 
+            const codeid=await Coupon.findOne({code})
             
+            let _id=codeid._id
+            
+    
+            const  updateCoupon= await Coupon.findByIdAndUpdate(
+                _id,
+                {
+                    $set: { code,
+                         discountType, 
+                         discountValue,
+                         maxDiscount,
+                         minPurchase,
+                         startDate,
+                         endDate,
+                         usageLimit,
+                        isActive }
+                },
+                {new:true}
+            );
 
+            if(!updateCoupon){
+                return res.status(404).json({
+                    success:false,
+                    message:"coupon not found"
+                })
+            }
 
+            return res.status(200).json({
+                success:true,
+                message:"coupon update successfully"
+            })
 
-
-
-        }catch(error){
-
+            
+          }catch(error){
+            console.log(error);
+           res.status(500).json({message:"Eror loading copuon side update page"});
         }
     };
     

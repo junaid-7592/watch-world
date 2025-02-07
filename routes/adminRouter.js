@@ -66,7 +66,7 @@ router.get("/addCoupon",adminAuth,adminController.addNewCoupon)
 router.post("/coupons",adminAuth,adminController.newCouponAdd)
 
 router.get("/updateCoupon/:id",adminAuth,adminController.lodeUpdateCoupon)
-router.put("/admin/Updatecoupons",adminAuth,adminController.updateCoupon)
+router.put("/Updatecoupons",adminAuth,adminController.updateCoupon)
 
 
 module.exports=router;

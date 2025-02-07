@@ -197,6 +197,7 @@
                     <a href="/admin/coupenManagmentlist">
                         <button type="button" class="cancel-btn">Cancel</button>
                     </a>
+                   
                     <button type="submit" class="update-btn">Update Coupon</button>
                 </div>
             </form>
@@ -207,17 +208,6 @@
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
             <script>
-
-                document.getElementById('discountType').addEventListener('change', function () {
-                    const maxDiscountRow = document.getElementById('maxDiscountRow');
-                    if (this.value === 'fixed') {
-                        maxDiscountRow.style.display = 'none';
-                        document.getElementById('maxDiscount').value = '';
-                    } else {
-                        maxDiscountRow.style.display = 'block';
-                    }
-                });
-
                 document.addEventListener("DOMContentLoaded", function () {
                     const elements = {
                         form: document.getElementById("couponForm"),
@@ -232,11 +222,17 @@
                         maxDiscountRow: document.getElementById("maxDiscountRow")
                     };
 
-                    // Handle discount type change
-                    elements.discountType.addEventListener('change', function () {
-                        elements.maxDiscountRow.style.display = this.value === 'fixed' ? 'none' : 'block';
-                        if (this.value === 'fixed') elements.maxDiscount.value = '';
-                    });
+                    function handleDiscountTypeChange() {
+                        const isFixed = elements.discountType.value === 'fixed';
+                        elements.maxDiscountRow.style.display = isFixed ? 'none' : 'block';
+
+                        
+                        if (isFixed) {
+                            elements.maxDiscount.value = '';
+                        }
+                    }
+                    elements.discountType.addEventListener('change', handleDiscountTypeChange);
+                    handleDiscountTypeChange();
 
                     // Format currency
                     const formatCurrency = (value) => {
@@ -340,6 +336,8 @@
                             isActive: elements.isActive.value
                         };
 
+
+
                         try {
                             const response = await fetch("/admin/Updatecoupons", {
                                 method: "PUT",
@@ -348,11 +346,8 @@
                                 },
                                 body: JSON.stringify(formData)
                             });
-                            
-                            console.log(formData);
-                            
 
-                            if (!response.ok) {
+                             if (!response.ok) {
                                 throw new Error(`HTTP error! status: ${response.status}`);
                             }
 

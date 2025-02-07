@@ -184,15 +184,15 @@
                 <span>free</span>
             </div>
 
-            <div class="coupon-section">
+            <!-- <div class="coupon-section">
                 <input type="text" placeholder="Enter coupon code">
                 <button class="apply-btn">Apply</button>
-            </div>
+            </div> -->
 
             <div class="total-section">
                 <div class="product-item">
                     <strong>Total</strong>
-                    <strong>$<%= cart.items.reduce((total, item) => total + (item.price * item.quantity), 0) + 4.99 %></strong>
+                    <strong>$<%= cart.items.reduce((total, item) => total + (item.price * item.quantity), 0)  %></strong>
                 </div>
             </div>
 
@@ -203,7 +203,6 @@
 
 
 
-            <!-- <button id="proceedCheckout" onclick="window.location.href='/checkout'" class="btn custom-button"></button> -->
         </div>
     </div>
 
