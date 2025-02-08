@@ -57,7 +57,7 @@ try {
 }
 }
 
-
+     
 
 
 const getForgotPassPage=async(req,res)=>{
@@ -335,7 +335,7 @@ const postAddAddress=async(req,res)=>{
 const editAddress=async(req,res)=>{
   try {
     const addressId=req.query.id;
-    const user=req.session.user;
+    const user=req.session.user;ch
     const currAddress=await Address.findOne({
       "address._id":addressId,
     });

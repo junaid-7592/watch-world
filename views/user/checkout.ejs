@@ -124,14 +124,14 @@
         <div class="checkout-form">
             <h2>Select Delivery Address</h2>
             <div class="address-container" >
-                <% if (address.length > 0) { %>
-                    <% address.forEach((data, index) => { %>
+                <% if (address && address.length > 0) { %> 
+                    <% address.forEach((data, index) => { %> 
                         <div class="address-card">
                             <input type="radio" name="address" value="<%= data._id %>" class="radio-input" <%= index === 0 ? 'checked' : '' %>>
                             <div class="address-type">Home</div>
                             <div class="address-field"><strong>Name:</strong> <%= data.name %></div>
                             <div class="address-field"><strong>City:</strong> <%= data.city %></div>
-                            <div class="address-field"><strong>Landmark:</strong> <%= data.landmark %></div>
+                            <div class="address-field"><strong>Landmark:</strong> <%= data.landMark %></div>
                             <div class="address-field"><strong>State:</strong> <%= data.state %></div>
                             <div class="address-field"><strong>Pincode:</strong> <%= data.pincode %></div>
                             <div class="address-field"><strong>Phone:</strong> <%= data.phone %></div>
@@ -140,6 +140,8 @@
                 <% } else { %>
                     <p>No saved addresses found.</p>
                 <% } %>
+                
+                
                 
 
                 <!-- Add New Address -->
@@ -161,50 +163,92 @@
                 </div>
             </div>            
         </div>
-
         <div class="order-summary">
             <h2>Order Summary</h2>
             <% cart.items.forEach(item => { %>
             <div class="product-item">
-                <img src="<%= item.productId.productImage[0] %>"alt="Product" class="product-image" width="80">
+                <img src="<%= item.productId.productImage[0] %>" alt="Product" class="product-image" width="80">
                 <div class="product-details">
-                    <div class="product-name"><%= item.name %></div>
-                    <div class="product-price">$<%= item.price %></div>
+                    <div class="product-name"><%= item.productId.productName %></div>
+                    <div class="product-price">$<%= item.productId.salePrice %></div>
                     <div class="quantity-controls">
                         <span class="quantity">Qty: <%= item.quantity %></span>
                     </div>
                 </div>
-                      <b>Total</b>
-                <div class="subtotal">$<%= (item.price * item.quantity).toFixed(2) %></div>
+                <b>Total</b>
+                <div class="subtotal">$<%= (item.productId.salePrice * item.quantity).toFixed(2) %></div>
             </div>
             <% }); %>
-
+        
+            <div class="coupon-section d-flex align-items-center">
+                <label for="couponSelect" class="me-2">Select a Coupon:</label>
+                <select id="couponSelect" name="couponCode" class="form-control w-auto me-2">
+                    <option value="">-- Select Coupon --</option>
+                    <% coupons.forEach(coupon => { %>
+                        <option value="<%= coupon.code %>">
+                            <%= coupon.code %> - <%= coupon.discountValue %> <%= coupon.discountType === 'percentage' ? '%' : '₹' %>
+                        </option>
+                    <% }) %>
+                </select>
+                <button id="applyCouponBtn" class="btn btn-primary">Apply</button>
+            </div>
+            <p id="couponMessage" style="color: red; margin-top: 5px;"></p>
+        
+            <div class="product-item">
+                <span>Sub Total</span>
+                <span>$<span id="subTotal"><%= subTotal.toFixed(2) %></span></span>
+            </div>
             <div class="product-item">
                 <span>Shipping</span>
-                <span>free</span>
+                <span>$<span id="shippingAmount"><%= shippingAmount.toFixed(2) %></span></span>
             </div>
-
-            <!-- <div class="coupon-section">
-                <input type="text" placeholder="Enter coupon code">
-                <button class="apply-btn">Apply</button>
-            </div> -->
-
+            <div class="product-item">
+                <span>Discount</span>
+                <span>-$<span id="discountAmount"><%= discountAmount.toFixed(2) %></span></span>
+            </div>
+        
             <div class="total-section">
                 <div class="product-item">
                     <strong>Total</strong>
-                    <strong>$<%= cart.items.reduce((total, item) => total + (item.price * item.quantity), 0)  %></strong>
+                    <strong>$<span id="totalAmount"><%= total.toFixed(2) %></span></strong>
                 </div>
             </div>
-
-
-
-
-            <button id="orderplaced" onclick="placeOrder('<%= cart._id %>','<%= cart.userId %>')" class="place-order-btn">Place Order</button>
-
-
-
+        
+            <button id="orderplaced" onclick="placeOrder('<%= cart._id %>', '<%= cart.userId %>')" class="place-order-btn">Place Order</button>
         </div>
-    </div>
+        
+        <script>
+            document.getElementById("applyCouponBtn").addEventListener("click", function () {
+                const couponCode = document.getElementById("couponSelect").value;
+                if (!couponCode) {
+                    document.getElementById("couponMessage").innerText = "Please select a coupon.";
+                    return;
+                }
+        
+                fetch("/apply-coupon", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ userId: "<%= cart.userId %>", couponCode })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById("subTotal").innerText = data.subTotal;
+                        document.getElementById("discountAmount").innerText = data.discountAmount;
+                        document.getElementById("shippingAmount").innerText = data.shippingAmount;
+                        document.getElementById("totalAmount").innerText = data.total;
+                        document.getElementById("couponMessage").innerText = "Coupon applied successfully!";
+                        document.getElementById("couponMessage").style.color = "green";
+                    } else {
+                        document.getElementById("couponMessage").innerText = data.message;
+                        document.getElementById("couponMessage").style.color = "red";
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+            });
+        </script>
+        
+      
 
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 

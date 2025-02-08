@@ -1,0 +1,288 @@
+<%-include ("../../views/partials/user/header") %>
+<head>
+   
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            padding: 1px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .wishlist-table {
+            width: 100%;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-collapse: collapse;
+            overflow: hidden;
+        }
+
+        .wishlist-table th {
+            background: #4a90e2;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+
+        .wishlist-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .product-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .stock-status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .in-stock {
+            background: #e3f5e6;
+            color: #2ecc71;
+        }
+
+        .out-stock {
+            background: #ffe6e6;
+            color: #e74c3c;
+        }
+
+        .action-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .add-cart {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .add-cart:hover {
+            background: #27ae60;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+
+        @media (max-width: 768px) {
+            .wishlist-table {
+                font-size: 14px;
+            }
+
+            .product-image {
+                width: 60px;
+                height: 60px;
+            }
+
+            .action-btn {
+                padding: 6px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>My Wishlist</h1>
+        <table class="wishlist-table">
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Stock Status</th>
+                    <th>Action</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (wishlist.length > 0) { %>
+                    <% wishlist.forEach(item => { %>
+                        <tr>
+                            <td><img src="<%= item.productId.productImage[0] %>" alt="<%= item.productId.name %>" class="product-image" width="80" height="80"></td>
+                            <td><%= item.productId.productName %></td>
+                            <td>$<%= item.productId.salePrice %></td>
+                            <td>
+                                <% if (item.productId.quantity > 0) { %>
+                                    <span class="stock-status in-stock">In Stock</span>
+                                <% } else { %>
+                                    <span class="stock-status out-stock">Out of Stock</span>
+                                <% } %>
+                            </td>
+                            <td>
+                                <button class="action-btn add-cart" <%= item.productId.quantity > 0 ? '' : 'disabled' %> data-id="<%= item.productId._id %>">Add to Cart</button> 
+                                 <!-- Existing Button -->
+                            
+
+                            </td>
+                            <td>
+                                <button class="action-btn delete-btn" data-id="<%= item.productId._id %>">Delete</button>
+                            </td>
+                        </tr>
+                    <% }); %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="6" class="text-center">No items in wishlist</td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Select all "Add to Cart" buttons
+            document.querySelectorAll(".add-cart").forEach(button => {
+                button.addEventListener("click", function () {
+                    const productId = this.getAttribute("data-id");
+    
+                    fetch('/cart/add', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ productId })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Remove item from wishlist after successfully adding to cart
+                            return fetch('removeFromWishlist', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ productId })
+                            });
+                        } else {
+                            throw new Error(data.message || 'Failed to add product to cart.');
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Remove the product row from the wishlist table
+                            const row = button.closest("tr");
+                            row.remove();
+    
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Added to Cart!',
+                                text: 'The product has been added to your cart and removed from the wishlist.',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        } else {
+                            throw new Error(data.message || 'Failed to remove from wishlist.');
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: error.message,
+                        });
+                    });
+                });
+            });
+        });
+
+
+
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+    // Select all delete buttons
+    document.querySelectorAll(".delete-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            const productId = this.getAttribute("data-id");
+
+            // Confirm before deleting
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to undo this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                
+                    fetch('/wishlist/remove', {  // Update route as per your backend
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ productId })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Remove the product row from the wishlist table
+                            const row = button.closest("tr");
+                            if (row) row.remove();
+
+                            Swal.fire({
+                                icon: "success",
+                                title: "Deleted!",
+                                text: "Product removed from wishlist successfully.",
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        } else {
+                            throw new Error(data.message || "Failed to remove product.");
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error!",
+                            text: error.message,
+                        });
+                    });
+                }
+            });
+        });
+    });
+});
+
+
+
+
+    </script>
+    

@@ -10,6 +10,10 @@ const Product = require("../../models/productSchema");
 const Cart = require("../../models/cartSchema");
 const Address=require("../../models/addressSchema")
 const Order=require("../../models/orderSChema")
+const Coupon=require("../../models/coupenSchema")
+
+const Wishlist = require("../../models/wishlistSchema");
+
 
 const productDetails = async (req, res) => {
     try {
@@ -78,7 +82,7 @@ const addTocart = async (req, res) => {
     try {
         const { productId, quantity } = req.body;
 
-        console.log(productId,quantity)
+        // console.log(productId,quantity)
        
         const product = await Product.findById(productId);
         if (!product) {
@@ -231,30 +235,211 @@ const updateTotel = async (req, res) => {
     }
 };
 
+// const getCheckout = async (req, res) => {
+//     try {
+
+//         const userId = req.session.user;    
+//         const addressData = await Address.find({ userId }).populate("address")
+
+
+//         const cart = await Cart.findOne({ userId }).populate("items.productId");
+//         const coupons = await Coupon.find()
+        
+
+
+// const Coupon = require("../models/couponModel");
+
 const getCheckout = async (req, res) => {
     try {
+      const userId = req.session.user;
+      const cart = await Cart.findOne({ userId }).populate("items.productId");
+      const coupons = await Coupon.find();
+      const addressData = await Address.find({ userId }).populate("address");
+  
+    //   console.log("000000000000000", addressData);
+    //   console.log("Fetched Address Data:", JSON.stringify(addressData, null, 2)); 
 
-        const userId = req.session.user;    
-        const addressData = await Address.find({ userId }).populate("address")
-
-
+  
+      if (!cart) {
+        return res.status(404).send("Cart not found"); // Added return to prevent further execution
+      }
+  
+      // Calculate subtotal
+      let subtotal = cart.items.reduce(
+        (total, item) => total + item.price * item.quantity,
+        0
+      );
+  
+      // Apply shipping logic
+      let shipping = 0;
+      if (subtotal >= 1000) {
+        shipping = 0;
+      } else if (subtotal >= 500) {
+        shipping = 30;
+      } else {
+        shipping = 50;
+      }
+  
+      res.render("checkout", {
+        cart,
+        coupons,
+        subTotal: subtotal,
+        shippingAmount: shipping,
+        discountAmount: 0,
+        total: subtotal + shipping,
+        address: addressData.length > 0 ? addressData[0].address : [], // Extract only addresses
+      });
+      
+  
+    //   console.log("uuuuuuuuuuuuu", addressData); // Fixed variable name
+  
+    } catch (error) {
+      console.error("Error rendering checkout page:", error);
+      res.status(500).send("Internal Server Error");
+    }
+  };
+  
+const applyCoupon = async (req, res) => {
+    try {
+        const { couponCode } = req.body;
+        // console.log(couponCode)
+        const userId = req.session.user;
         const cart = await Cart.findOne({ userId }).populate("items.productId");
 
-
         if (!cart) {
-            return res.status(404).send("User or Cart not found");
-       }            
+            return res.status(404).json({ success: false, message: "Cart not found" });
+        }
 
-         res.render("checkout", {
-            address: addressData.length > 0 ? addressData[0].address : [],  
-            cart: cart,
-            
+        const coupon = await Coupon.findOne({ code: couponCode });
+
+        if (!coupon) {
+            return res.json({ success: false, message: "Invalid coupon code" });
+        }
+
+        let subtotal = cart.items.reduce((total, item) => total + (item.price * item.quantity), 0);
+        let discount = 0;
+
+        // Apply coupon discount logic
+        if (coupon.discountType === "percentage") {
+            discount = (subtotal * coupon.discountValue) / 100;
+            if (coupon.maxDiscount && discount > coupon.maxDiscount) {
+                discount = coupon.maxDiscount;
+            }
+        } else if (coupon.discountType === "fixed") {
+            discount = coupon.discountValue;
+        }
+
+        // Ensure discount does not exceed subtotal
+        if (discount > subtotal) {
+            discount = subtotal;
+        }
+
+        // Apply shipping logic
+        let shipping = 0;
+        let totalAfterDiscount = subtotal - discount;
+        if (totalAfterDiscount >= 1000) {
+            shipping = 0;
+        } else if (totalAfterDiscount >= 500) {
+            shipping = 30;
+        } else {
+            shipping = 50;
+        }
+
+        let total = totalAfterDiscount + shipping;
+
+        // Store applied coupon in database
+        cart.appliedCoupon = couponCode;
+        await cart.save();
+
+        res.json({
+            success: true,
+            subTotal: subtotal.toFixed(2),
+            discountAmount: discount.toFixed(2),
+            shippingAmount: shipping.toFixed(2),
+            total: total.toFixed(2),
+            message: "Coupon applied successfully!"
         });
-     } catch (error) {
-        console.error("Error rendering checkout page:", error);
-        res.status(500).send("Internal Server Error");
+
+    } catch (error) {
+        console.error("Error applying coupon:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
+
+
+
+
+
+
+
+// const applyCoupon = async (req, res) => {
+//     try {
+//         const { userId, couponCode } = req.body;
+
+//         // Fetch user's cart
+//         const cart = await Cart.findOne({ userId }).populate("items.productId");
+//         if (!cart) {
+//             return res.status(404).json({ success: false, message: "Cart not found" });
+//         }
+
+//         // Fetch coupon details
+//         const coupon = await Coupon.findOne({ code: couponCode, isActive: true });
+//         if (!coupon) {
+//             return res.status(400).json({ success: false, message: "Invalid or expired coupon" });
+//         }
+
+//         // Calculate Subtotal (before discount)
+//         let subTotal = cart.items.reduce((total, item) => total + item.productId.salePrice * item.quantity, 0);
+        
+//         let discountAmount = 0;
+//         if (coupon.discountType === "percentage") {
+//             discountAmount = (subTotal * coupon.discountValue) / 100;
+//             if (coupon.maxDiscount) {
+//                 discountAmount = Math.min(discountAmount, coupon.maxDiscount);
+//             }
+//         } else {
+//             discountAmount = coupon.discountValue;
+//         }
+
+//         // Ensure discount does not exceed subtotal
+//         discountAmount = Math.min(discountAmount, subTotal);
+
+//         // Calculate subtotal after discount
+//         let discountedTotal = subTotal - discountAmount;
+
+//         // Apply shipping logic
+//         let shippingAmount = 0;
+//         if (discountedTotal >= 1000) {
+//             shippingAmount = 0;  // Free shipping
+//         } else if (discountedTotal >= 500) {
+//             shippingAmount = 30; // ₹30 shipping
+//         } else {
+//             shippingAmount = 50; // ₹50 shipping
+//         }
+
+//         // Calculate Final Total
+//         let total = discountedTotal + shippingAmount;
+
+//         // Store the applied coupon in the database
+//         cart.appliedCoupon = couponCode;
+//         await cart.save();
+
+//         return res.json({
+//             success: true,
+//             subTotal,
+//             discountAmount,
+//             shippingAmount,
+//             total,
+//             message: "Coupon applied successfully!"
+//         });
+
+//     } catch (error) {
+//         console.error("Error applying coupon:", error);
+//         res.status(500).json({ success: false, message: "Internal Server Error" });
+//     }
+// };
+       
+      
 
 const OrderSuccess = async (req, res) => {
     try {
@@ -270,7 +455,7 @@ const OrderSuccess = async (req, res) => {
             return res.status(400).json({ success: false, message: "Cart is empty so add items." });
         }
 
-        // (3) **Stock & Total Amount Check**
+        // (3) **Stock & Total Amount Check*
         let totalAmount = 0;
         const updatedItems = [];
 
@@ -420,6 +605,124 @@ const razorpay = new Razorpay({
 
 
 
+// --------------------------------------------------------
+
+
+  
+  // Get wishlist items
+  const getWishlist = async (req, res) => {
+      try {
+          const userId = req.user.id; // Assuming user is authenticated
+          const wishlist = await Wishlist.findOne({ userId }).populate('products.productId');
+  
+          res.render('wishlist', { wishlist: wishlist ? wishlist.products : [] });
+      } catch (error) {
+          res.status(500).json({ error: 'Failed to fetch wishlist' });
+      }
+  };
+  
+  // Add product to wishlist
+  const addToWishlist = async (req, res) => {
+      try {
+          const { productId } = req.body;
+          const userId = req.user.id;
+  
+          let wishlist = await Wishlist.findOne({ userId });
+          if (!wishlist) {
+              wishlist = new Wishlist({ userId, products: [] });
+          }
+  
+          if (!wishlist.products.some(p => p.productId.equals(productId))) {
+              wishlist.products.push({ productId });
+              await wishlist.save();
+          }
+  
+          res.json({ success: true, message: 'Added to wishlist' });
+      } catch (error) {
+          res.status(500).json({ error: 'Failed to add to wishlist' });
+      }
+  };
+  
+  // Remove product from wishlist
+//   exports.removeFromWishlist = async (req, res) => {
+//       try {
+//           const { productId } = req.body;
+//           const userId = req.user.id;
+  
+//           const wishlist = await Wishlist.findOneAndUpdate(
+//               { userId },
+//               { $pull: { products: { productId } } },
+//               { new: true }
+//           );
+  
+//           res.json({ success: true, message: 'Removed from wishlist' });
+//       } catch (error) {
+//           res.status(500).json({ error: 'Failed to remove from wishlist' });
+//       }
+//   };
+  
+   // **Remove product from wishlist**
+
+   const removeFromWishlist = async (req, res) => {
+    try {
+        const { productId } = req.body;
+        const userId = req.user.id; // Ensure user is authenticated
+
+        if (!userId || !productId) {
+            return res.status(400).json({ success: false, message: "User ID and Product ID are required" });
+        }
+
+        // Remove the product from the wishlist
+        const updatedWishlist = await Wishlist.findOneAndUpdate(
+            { userId },
+            { $pull: { items: { productId } } }, // Removes the product from wishlist
+            { new: true }
+        );
+
+        if (!updatedWishlist) {
+            return res.status(404).json({ success: false, message: "Wishlist not found" });
+        }
+
+        return res.json({ success: true, message: "Product removed from wishlist", wishlist: updatedWishlist });
+
+    } catch (error) {
+        console.error("Error removing product from wishlist:", error);
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
+}; 
+
+  //bfor added to cart  
+const removeInWhishlist= async (req, res) => {
+    try {
+        const { productId } = req.body; // Assuming productId is sent in the request body
+        const userId = req.session.user; // Get user ID from session
+
+        if (!userId || !productId) {
+            return res.status(400).json({ success: false, message: "User ID and Product ID are required" });
+        }
+
+        // Find the user's wishlist
+        const wishlist = await Wishlist.findOne({ userId });
+
+        if (!wishlist) {
+            return res.status(404).json({ success: false, message: "Wishlist not found" });
+        }
+
+        // Remove the product from the wishlist
+        wishlist.products = wishlist.products.filter(item => item.toString() !== productId);
+        
+        // Save the updated wishlist
+        await wishlist.save();
+
+        return res.status(200).json({ success: true, message: "Product removed from wishlist", wishlist });
+    } catch (error) {
+        console.error("Error removing product from wishlist:", error);
+        return res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+};
+
+
+
 
 
 
@@ -434,6 +737,10 @@ module.exports = {
     OrderSuccess,
     getOrderSuccess,
     cancelOrder,
-    
+    applyCoupon,
     CreateOrderRazaorpay,
-};
+    getWishlist,
+    addToWishlist,
+    removeFromWishlist,
+    removeInWhishlist,
+}

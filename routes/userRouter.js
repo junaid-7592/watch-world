@@ -120,7 +120,7 @@ router.post("/addAddressFromcheckout",auth.userAuth,profileController.postaddres
 
  router.post("/cart/add",auth.userAuth,productController.addTocart)
  router.get("/Cart",productController.getCart)
-router.post("/update-cart/:itemId",productController.cartUpdate)   //dynamic route
+router.post("/update-cart/:itemId",productController.cartUpdate)   
 router.post("/cart-updateTotal",productController.updateTotel)
 router.get('/checkout',productController.getCheckout)
 router.get('/orderSuccess',auth.userAuth,productController.getOrderSuccess)
@@ -133,6 +133,18 @@ router.post("/create-orderRazorpay",auth.userAuth,productController.CreateOrderR
 
 
 router.post('/removeCartItem/:cartId/:itemId',productController.removeCartItem)
+router.post("/apply-coupon",auth.userAuth,productController.applyCoupon)
 
-                                                         
-module.exports = router;                                                  
+router.get("/wishlist",auth.userAuth,productController. getWishlist)      
+router.post("/wishlist",auth.userAuth,productController.addToWishlist )  
+router.post("/removeFromWishlist",auth.userAuth,productController.removeFromWishlist)  
+router.post('/wishlist/remove',auth.userAuth,productController.removeInWhishlist)
+
+
+
+
+
+
+module.exports = router;    
+
+

@@ -29,7 +29,7 @@ const orderSchema = new Schema({
     type: Number,
     default: 0
   },
-  finalAmount: {
+ finalAmount : {
     type: Number,
     required: true
   },
