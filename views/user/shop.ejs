@@ -254,13 +254,10 @@
 							</select>
 							
 						
-							<div>
-								<h2>CATEGORY</h2>
-							</div>
 							<select id="category-select" style="margin-bottom: 15px; width: 16rem; height: 3rem; font-size: larger;">
 								<option value="all">All Categories</option>
 								<% categoryOptions.forEach(function(category) { %>
-									<option value="<%= category.value %>" <%= category.selected ? 'selected' : '' %>>
+									<option value="<%= category.value %>">
 										<%= category.name %>
 									</option>
 								<% }); %>
@@ -521,25 +518,95 @@ function updateProductList(products) {
         productContainer.innerHTML += productHTML;
     });
 }
-
 // Frontend JavaScript
-document.addEventListener('DOMContentLoaded', function() {
+function applyCategory() {
     const categorySelect = document.getElementById('category-select');
+    const selectedCategory = categorySelect.value;
     
-    categorySelect.addEventListener('change', function() {
-        const selectedCategory = this.value;
-        const currentUrl = new URL(window.location.href);
-        
-        if (selectedCategory) {
-            currentUrl.searchParams.set('category', selectedCategory);
-        } else {
-            currentUrl.searchParams.delete('category');
-        }
-        
-        currentUrl.searchParams.set('page', '1');
-        window.location.href = currentUrl.toString();
+    fetch(`/api/products?category=${selectedCategory}`)
+        .then(response => response.json())
+        .then(data => {
+            updateProductList(data.products);
+            updatePagination(data.currentPage, data.totalPages);
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+function updateProductList(products) {
+    const productContainer = document.querySelector(".products");
+    productContainer.innerHTML = "";
+    
+    products.forEach(prod => {
+        const productHTML = `
+            <div class="singel-product single-product-col">
+                <div class="label-pro-new">New</div>
+                <div class="carousel-inner">
+                    ${prod.productImage.map((image, index) => `
+                        <div class="carousel-item ${index === 0 ? 'active' : ''}">
+                            <img src="${image}" onclick="window.location.href='/productinfo?id=${prod._id}'" class="d-block w-100" alt="${prod.productName}">
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="single-product-content">
+                    <h2 class="product-name">
+                        <a href="/productinfo?id=${prod._id}">${prod.productName}</a>
+                    </h2>
+                    <div class="ratings">
+                        <div class="rating-box">
+                            <div class="rating">
+                                ${'<i class="fa fa-star"></i>'.repeat(prod.rating)}
+                                ${'<i class="fa fa-star-o"></i>'.repeat(5 - prod.rating)}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="product-price">
+                        <p>$${prod.salePrice}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        productContainer.innerHTML += productHTML;
     });
-});
+}
+
+function updatePagination(currentPage, totalPages) {
+    const paginationContainer = document.querySelector(".pagination-container");
+    let paginationHTML = '';
+    
+    if (currentPage > 1) {
+        paginationHTML += `<a href="#" onclick="changePage(${currentPage - 1})">&laquo; Previous</a>`;
+    }
+    
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === currentPage) {
+            paginationHTML += `<span class="current-page">${i}</span>`;
+        } else {
+            paginationHTML += `<a href="#" onclick="changePage(${i})">${i}</a>`;
+        }
+    }
+    
+    if (currentPage < totalPages) {
+        paginationHTML += `<a href="#" onclick="changePage(${currentPage + 1})">Next &raquo;</a>`;
+    }
+    
+    paginationContainer.innerHTML = paginationHTML;
+}
+
+function changePage(page) {
+    const categorySelect = document.getElementById('category-select');
+    const selectedCategory = categorySelect.value;
+    
+    fetch(`/api/products?category=${selectedCategory}&page=${page}`)
+        .then(response => response.json())
+        .then(data => {
+            updateProductList(data.products);
+            updatePagination(data.currentPage, data.totalPages);
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+// Add event listener to category select
+document.getElementById('category-select').addEventListener('change', applyCategory);
 
 </script>
 

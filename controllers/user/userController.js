@@ -346,6 +346,52 @@ const shopget = async (req, res) => {
 };
 // const Product = require("../models/Product");
 
+const categoryFilter = async (req,res) =>{
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = 8;
+        const skip = (page - 1) * limit;
+        
+        let filterQuery = {
+            isBlocked: false,
+            quantity: { $gt: 0 }
+        };
+
+        if (req.query.category && req.query.category !== 'all') {
+            const selectedCategory = await Category.findOne({ 
+                name: req.query.category,
+                isListed: true 
+            });
+            
+            if (selectedCategory) {
+                filterQuery.category = selectedCategory._id;
+            }
+        }
+
+        const totalProducts = await product.countDocuments(filterQuery);
+        const totalPages = Math.ceil(totalProducts / limit);
+        
+        const products = await product.find(filterQuery)
+            .skip(skip)
+            .limit(limit)
+            .populate('category');
+
+        res.json({
+            success: true,
+            products,
+            currentPage: page,
+            totalPages
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Error fetching products" 
+        });
+    }
+}
+
+
 // Controller function for sorting products
 const getSortedProducts = async (req, res) => {
     try {       
@@ -408,6 +454,7 @@ module.exports={
     logout,
     shopget,
     getSortedProducts ,
+    categoryFilter,
 } ;                                                   
 
 

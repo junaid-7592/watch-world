@@ -75,7 +75,7 @@ router.get('/auth/google/callback',
 
 router.get("/shop",userController.shopget)
 router.get("/products",userController.getSortedProducts);
-
+router.get('/api/products',userController.categoryFilter);
 //profile manegment
 
 router.get("/forgot-password",profileController.getForgotPassPage)
