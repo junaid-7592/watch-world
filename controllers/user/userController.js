@@ -315,10 +315,14 @@ const shopget = async (req, res) => {
         .skip(skip)
         .limit(limit);
 
+        console.log(categories);     
+        
+
         return res.render("shop", { 
             product: productData,
             currentPage: page,
-            totalPages: totalPages
+            totalPages: totalPages,
+            categories:categories
         });
     } catch (error) {
         console.error(`Error occurred: ${error}`);

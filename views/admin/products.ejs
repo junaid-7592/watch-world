@@ -1,206 +1,269 @@
 <%- include("../../views/partials/admin/header") %>
-<head>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
-    <style>
-        /* General styles */
-        .content-header {
-            text-align: center;
-            margin: 20px 0;
-        }
-        .card-header {
-            background-color: #f8f9fa;
-            padding: 15px;
-        }
-        .input-group {
-            margin: auto;
-        }
-        .form-control {
-            padding: 10px;
-        }
-        /* Button styles */
-        .btn {
-            border-radius: 5px;
-            font-size: 14px;
-            padding: 8px 12px;
-            transition: background-color 0.3s ease;
-        }
-        .btn-danger {
-            background-color: #dc3545;
-            border: none;
-        }
-        .btn-danger:hover {
-            background-color: #b02a37;
-        }
-        .btn-success {
-            background-color: #28a745;
-            border: none;
-        }
-        .btn-success:hover {
-            background-color: #218838;
-        }
-        .btn-info {
-            background-color: #17a2b8;
-            border: none;
-        }
-        .btn-info:hover {
-            background-color: #138496;
-        }
-        .btn a {
-            color: white;
-            text-decoration: none;
-        }
-        .btn a:hover {
-            text-decoration: underline;
-        }
-        /* Table styling */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            background-color: #ffffff;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-        th, td {
-            text-align: center;
-            padding: 12px;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #f4f4f4;
-            font-weight: bold;
-        }
-        tbody tr:hover {
-            background-color: #f9f9f9;
-        }
-        .pagination-custom {
-            display: flex;
-            justify-content: center;
-            padding: 0;
-            list-style: none;
-            margin-right: 200px;
-        }
 
-        .pagination-custom .page-item {
-            margin: 0 5px;
-        }
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-        .pagination-custom .page-link {
-            display: inline-block;
-            padding: 10px 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            text-decoration: none;
-            color: #007bff;
-            transition: background-color 0.3s, color 0.3s;
-        }
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-        /* Hover effect */
-        .pagination-custom .page-link:hover {
-            background-color: #f1f1f1;
-            color: #0056b3;
-        }
+        <style>
+            /* General styles */
+            .content-header {
+                text-align: center;
+                margin: 20px 0;
+            }
 
-        /* Active page styling */
-        .pagination-custom .page-item.active .page-link {
-            background-color: #007bff;
-            color: #fff;
-            border-color: #007bff;
-            pointer-events: none;
-        }
+            .card-header {
+                background-color: #f8f9fa;
+                padding: 15px;
+            }
 
-        /* Optional: Styling for disabled pages */
-        .pagination-custom .page-item.disabled .page-link {
-            color: #6c757d;
-            pointer-events: none;
-            background-color: #e9ecef;
-            border-color: #dee2e6;
-        }
-    </style>
-</head>
-<div class="content-header">
-    <div>
-        <h2 class="content-title card-title">Products</h2>
-    </div>
-</div>
-<header class="card-header text-center mb-20">
-    <form action="" method="get" class="d-inline">
-        <div class="input-group input-group-sm border border-1 border-grey rounded-pill" style="max-width: 500px; margin: auto;">
-            <input type="text" class="form-control border-0 rounded-pill" placeholder="Search products or brands" name="search">
-            <button class="btn btn-primary border-0" type="submit">Search</button>
+            .input-group {
+                margin: auto;
+            }
+
+            .form-control {
+                padding: 10px;
+            }
+
+            /* Button styles */
+            .btn {
+                border-radius: 5px;
+                font-size: 14px;
+                padding: 8px 12px;
+                transition: background-color 0.3s ease;
+            }
+
+            .btn-danger {
+                background-color: #dc3545;
+                border: none;
+            }
+
+            .btn-danger:hover {
+                background-color: #b02a37;
+            }
+
+            .btn-success {
+                background-color: #28a745;
+                border: none;
+            }
+
+            .btn-success:hover {
+                background-color: #218838;
+            }
+
+            .btn-info {
+                background-color: #17a2b8;
+                border: none;
+            }
+
+            .btn-info:hover {
+                background-color: #138496;
+            }
+
+            .btn a {
+                color: white;
+                text-decoration: none;
+            }
+
+            .btn a:hover {
+                text-decoration: underline;
+            }
+
+            /* Table styling */
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+                background-color: #ffffff;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            th,
+            td {
+                text-align: center;
+                padding: 12px;
+                border-bottom: 1px solid #ddd;
+            }
+
+            th {
+                background-color: #f4f4f4;
+                font-weight: bold;
+            }
+
+            tbody tr:hover {
+                background-color: #f9f9f9;
+            }
+
+            .pagination-custom {
+                display: flex;
+                justify-content: center;
+                padding: 0;
+                list-style: none;
+                margin-right: 200px;
+            }
+
+            .pagination-custom .page-item {
+                margin: 0 5px;
+            }
+
+            .pagination-custom .page-link {
+                display: inline-block;
+                padding: 10px 15px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                text-decoration: none;
+                color: #007bff;
+                transition: background-color 0.3s, color 0.3s;
+            }
+
+            /* Hover effect */
+            .pagination-custom .page-link:hover {
+                background-color: #f1f1f1;
+                color: #0056b3;
+            }
+
+            /* Active page styling */
+            .pagination-custom .page-item.active .page-link {
+                background-color: #007bff;
+                color: #fff;
+                border-color: #007bff;
+                pointer-events: none;
+            }
+
+            /* Optional: Styling for disabled pages */
+            .pagination-custom .page-item.disabled .page-link {
+                color: #6c757d;
+                pointer-events: none;
+                background-color: #e9ecef;
+                border-color: #dee2e6;
+            }
+        </style>
+    </head>
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Products</h2>
         </div>
-    </form>
-</header>
-<div class="right mt-5">
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>image</th>
-                <th scope="col"><b>Product name</b></th>
-                <!-- <th scope="col"><b>Brand</b></th> -->
-                <th scope="col"><b>Category</b></th>
-                <th scope="col"><b>Sale Price</b></th>
-
-                <th scope="col"><b>Offer Price</b></th>
-                <th scope="col"><b>Offer</b></th>
-                <th scope="col"><b>Quantity</b></th>
-                <th scope="col"><b>Action</b></th>
-                <th scope="col"><b>Edit</b></th>
-            </tr>
-        </thead>
-        <tbody>
-           <%for(let i=data.length-1;i>=0;i--) {%>
-            <tr>
-            <td><img style="width: 60px; height: auto;" src=" <%= data[i].productImage[0] %>" alt=""></td>
-                <!-- <td>Example Product</td> -->
-                <!-- <td>Example Brand</td> -->
-                <td><%=data[i].productName%></td>
-                <td><%=data[i].category.name%></td>
-                <td><%=data[i].salePrice%></td>
-                <td>10% Off</td>
-                <td>100</td>
-                <td><%=data[i].quantity%></td>
-                <td>
-
-
-
-
-
-
-               <%if(data[i].isBlocked===false){%>
-                    <button class="btn btn-danger">
-                        <a href="/admin/blockProduct?id=<%=data[i]._id%>">Block</a>
-                    </button>
-                    <%}else{%>
-                    <button class="btn btn-success">
-                        <a href="/admin/unblockProduct?id=<%=data[i]._id%>">Unblock</a>
-                    </button>
-                    <%}%>
-                </td>
-                <td>
-                    <button class="btn btn-info">
-                        <a href="/admin/editProduct/<%=data[i]._id%>">Edit</a>
-                    </button>
-                </td>
-            </tr>
-            <%}%>
-        </tbody>
-    </table>
-</div>
-
-<div class="container mt-3">
-    <div class="container mt-3">
-        <nav aria-label="Page navigation">
-            <ul class="pagination-custom">
-                <% for (let i = 1; i <= totalPages; i++) { %>
-                    <li class="page-item <%= currentPage == i ? 'active' : '' %>">
-                        <a class="page-link" href="?page=<%= i %>"><%= i %></a>
-                    </li>
-                <% } %>
-            </ul>
-        </nav>
     </div>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-<%- include("../../views/partials/admin/footer") %>
-               
+    <header class="card-header text-center mb-20">
+        <form action="" method="get" class="d-inline">
+            <div class="input-group input-group-sm border border-1 border-grey rounded-pill"
+                style="max-width: 500px; margin: auto;">
+                <input type="text" class="form-control border-0 rounded-pill" placeholder="Search products or brands"
+                    name="search">
+                <button class="btn btn-primary border-0" type="submit">Search</button>
+            </div>
+        </form>
+    </header>
+    <div class="right mt-5">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 100px">Image</th>
+                                <th>Product Details</th>
+                                <th>Pricing</th>
+                                <th>Stock</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% for(let product of data.reverse()) { %>
+                                <tr>
+                                    <!-- Product Image -->
+                                    <td>
+                                        <img src="<%= product.productImage[0] %>"
+                                            style="width: 80px; height: 80px; object-fit: cover">
+                                    </td>
+
+                                    <!-- Product Details -->
+                                    <td>
+                                        <h6 class="mb-1">
+                                            <%= product.productName %>
+                                        </h6>
+                                        <small class="text-muted">
+                                            Category: <%= product.category.name %><br>
+                                                Color: <%= product.color %>
+                                        </small>
+                                    </td>
+
+                                    <!-- Pricing Information -->
+                                    <td>
+                                        <div class="d-flex flex-column">
+                                                <span class="text-decoration-line-through text-muted">
+                                                    ₹<%= product.regularPrice %>
+                                                </span>
+                                                <span class="text-success fw-bold">
+                                                    ₹<%= product.salePrice %>
+                                                    <% if (product.regularPrice > product.salePrice) { %>
+                                                        <span class="badge bg-success">
+                                                            <%= Math.round(((product.regularPrice - product.salePrice) / product.regularPrice) * 100) %>% OFF
+                                                        </span>
+                                                    <% } %>
+                                                </span>
+                                        </div>
+                                    </td>
+
+                                    <!-- Stock Information -->
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <%= product.quantity %>
+                                                <% if (product.quantity < 10) { %>
+                                                    <span class="badge bg-warning ms-2">Low Stock</span>
+                                                    <% } %>
+                                        </div>
+                                    </td>
+
+                                    <!-- Status -->
+                                    <td>
+                                        <span
+                                            class="badge <%= product.status === 'Available' ? 'bg-success' : 'bg-danger' %>">
+                                            <%= product.status %>
+                                        </span>
+                                    </td>
+
+                                    <!-- Actions -->
+                                    <td>
+                                        <div class="btn-group">
+                                            <button class="btn btn-sm btn-outline-primary"
+                                                onclick="location.href='/admin/editProduct/<%= product._id %>'">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button
+                                                class="btn btn-sm <%= product.isBlocked ? 'btn-success' : 'btn-danger' %>"
+                                                onclick="location.href='/admin/<%= product.isBlocked ? 'unblock' : 'block' %>Product?id=<%= product._id %>'">
+                                                <i class="fas fa-<%= product.isBlocked ? 'unlock' : 'lock' %>"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-3">
+        <div class="container mt-3">
+            <nav aria-label="Page navigation">
+                <ul class="pagination-custom">
+                    <% for (let i=1; i <=totalPages; i++) { %>
+                        <li class="page-item <%= currentPage == i ? 'active' : '' %>">
+                            <a class="page-link" href="?page=<%= i %>">
+                                <%= i %>
+                            </a>
+                        </li>
+                        <% } %>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <%- include("../../views/partials/admin/footer") %>

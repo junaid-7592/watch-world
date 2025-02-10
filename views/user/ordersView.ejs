@@ -314,9 +314,10 @@
     document.addEventListener("DOMContentLoaded", function () {
         const cancelBtn = document.getElementById("cancelOrder");
 
-        // Order ID frontend-il store cheyyuka (Safe way)
+        // Store Order ID and Total Amount safely
         const orderId = "<%= order._id %>";
-
+        const totalAmount = "<%= order.finalAmount %>"; // Ensure you pass totalAmount from backend
+        console.log("this totalAmount",totalAmount)
         cancelBtn.addEventListener("click", function (e) {
             e.preventDefault();
 
@@ -330,31 +331,44 @@
                 confirmButtonText: "Yes, cancel it!"
             }).then((result) => {
                 if (result.isConfirmed) {
-                   
-
+                    console.log(111111111111111111)
+                    // First API call to cancel the order
                     fetch(`/order/cancel/${orderId}`, {
                         method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({ orderId: orderId }) // Order ID backend-il send cheyyuka
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ orderId: orderId,amount:totalAmount })
                     })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            Swal.fire("Cancelled!", "Your order has been cancelled.", "success")
-                            .then(() => location.reload()); // Page refresh cheyyum
+                            console.log(22222222222222)
+                            // Second API call to refund
+                            return fetch(`/refund/${orderId}`, {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ orderId: orderId,amount: totalAmount})
+                            });
+
                         } else {
-                            Swal.fire("Error!", data.message, "error");
+                            throw new Error(data.message);
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(refundData => {
+                        if (refundData.success) {
+                            console.log(33333333333333)
+                            Swal.fire("Cancelled!", "Your order has been cancelled and refunded.", "success")
+                            .then(() => location.reload()); // Refresh page
+                        } else {
+                            throw new Error(refundData.message);
                         }
                     })
                     .catch(error => {
                         console.error("Error:", error);
-                        Swal.fire("Error!", "Something went wrong.", "error");
+                        Swal.fire("Error!",  "llll3333335555Something went wrong.", "error");
                     });
                 }
             });
         });
     });
 </script>
-        

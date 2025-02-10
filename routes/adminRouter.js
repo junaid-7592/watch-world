@@ -38,6 +38,10 @@ router.post("/deleteImage",adminAuth,productController.deleteSingleImage)
 router.post('/croppedImage/:productId', upload.single("image"),productController.croppedImage)
 
 
+router.post('/addCategoryOffer', categoryController.addCategoryOffer);
+router.post('/removeCategoryOffer', categoryController.removeCategoryOffer);
+
+
 //product Manegment
 
 // GET route for the product add page

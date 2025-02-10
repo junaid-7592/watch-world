@@ -1,5 +1,6 @@
 const handleUpload = require("../../config/cloudinary");
 const Category = require("../../models/category");
+const Product = require('../../models/productSchema')
 
 const categoryInfo = async (req, res) => {
     try {
@@ -28,7 +29,7 @@ const categoryInfo = async (req, res) => {
     }
 }
 
-
+    
 const addCategory = async (req, res) => {
     const { name, description } = req.body;
     
@@ -123,6 +124,94 @@ const editCategory = async (req, res) => {
 };
 
 
+const addCategoryOffer = async (req, res) => {
+    try {
+        const { categoryId, offerPercentage } = req.body;
+
+        // Validate offer percentage
+        if (offerPercentage < 10 || offerPercentage > 70) {
+            return res.status(400).json({ error: 'Offer percentage must be between 10 and 70' });
+        }
+
+        // Find the category
+        const category = await Category.findById(categoryId);
+        if (!category) {
+            return res.status(404).json({ error: 'Category not found' });
+        }
+   
+        // Update category with offer
+        category.categoryOffer = offerPercentage;
+        await category.save();
+
+        // Find all products in this category
+        const products = await Product.find({ category: categoryId });
+
+        // Update each product's sale price based on the offer
+        for (const product of products) {
+            const originalPrice = product.regularPrice || product.salePrice;
+            const newSalePrice = originalPrice - (originalPrice * (offerPercentage / 100));
+
+            // Only update if the new sale price is lower than current sale price
+            if (newSalePrice < product.salePrice) {
+                // Store current sale price in prevOfferPrice before updating
+                product.prevOfferPrice = product.salePrice;
+                product.salePrice = Math.round(newSalePrice);
+                await product.save();
+            }
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Category offer added successfully' 
+        });
+
+    } catch (error) {
+        console.error('Error adding category offer:', error);
+        res.status(500).json({ 
+            error: 'Internal server error while adding offer' 
+        });
+    }
+};
+
+const removeCategoryOffer = async (req, res) => {
+    try {
+        const { categoryId } = req.body;
+
+        // Find the category
+        const category = await Category.findById(categoryId);
+        if (!category) {
+            return res.status(404).json({ error: 'Category not found' });
+        }
+
+        // Remove category offer
+        category.categoryOffer = 0;
+        await category.save();
+
+        // Find all products in this category
+        const products = await Product.find({ category: categoryId });
+
+        // Restore original prices for products
+        for (const product of products) {
+            if (product.prevOfferPrice) {
+                product.salePrice = product.prevOfferPrice;
+                product.prevOfferPrice = null;
+                await product.save();
+            }
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Category offer removed successfully' 
+        });
+
+    } catch (error) {
+        console.error('Error removing category offer:', error);
+        res.status(500).json({ 
+            error: 'Internal server error while removing offer' 
+        });
+    }
+};
+
 
 
 
@@ -135,4 +224,6 @@ module.exports = {
     getUnlistCategory,
     getEditCategory,
     editCategory,
+    addCategoryOffer,
+    removeCategoryOffer
 }

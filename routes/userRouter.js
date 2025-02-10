@@ -4,6 +4,10 @@ const userController = require("../controllers/user/userController");
 const passport = require("passport");
 const profileController=require("../controllers/user/profileController")
 const productController = require('../controllers/user/productCondroller')
+// const Transaction = require('../models/Transaction'); // Check if this file exis
+const walletController = require('../controllers/user/walletController')
+
+
 const auth = require('../middlewares/auth')
 // const Cart = require("../models/cart");
 // const {adminAuth,userAuth}=require("../middlewares/auth")
@@ -140,7 +144,10 @@ router.post("/wishlist",auth.userAuth,productController.addToWishlist )
 router.post("/removeFromWishlist",auth.userAuth,productController.removeFromWishlist)  
 router.post('/wishlist/remove',auth.userAuth,productController.removeInWhishlist)
 
+//whallet
+router.get("/getWallet",auth.userAuth,walletController.showWallet)
 
+router.post("/refund/:orderId/",auth.userAuth,walletController.refundToWallet)
 
 
 

@@ -6,7 +6,7 @@ const User=require("../../models/userSchema");
 const mongoose=require("mongoose");
 const bcrypt=require("bcrypt");   //password compire
 
-
+    
 
 
 const pageerror=async (req,res)=>{
