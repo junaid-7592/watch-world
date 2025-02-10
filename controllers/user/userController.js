@@ -298,39 +298,52 @@ const shopget = async (req, res) => {
         const skip = (page - 1) * limit;
         
         const categories = await Category.find({ isListed: true });
+        const categoryFilter = req.query.category;
         
-        const totalProducts = await product.countDocuments({
+        let filterQuery = {
             isBlocked: false,
-            category: { $in: categories.map(category => category._id) },
             quantity: { $gt: 0 }
-        });
-        
+        };
+
+        if (categoryFilter && categoryFilter !== 'all') {
+            // Find category by name instead of value
+            const selectedCategory = await Category.findOne({ 
+                name: categoryFilter,
+                isListed: true 
+            });
+            
+            if (selectedCategory) {
+                filterQuery.category = selectedCategory._id;
+            }
+        }
+
+        const totalProducts = await product.countDocuments(filterQuery);
         const totalPages = Math.ceil(totalProducts / limit);
         
-        const productData = await product.find({
-            isBlocked: false,
-            category: { $in: categories.map(category => category._id) },
-            quantity: { $gt: 0 }
-        })
-        .skip(skip)
-        .limit(limit);
+        const productData = await product.find(filterQuery)
+            .skip(skip)
+            .limit(limit)
+            .populate('category');
 
-        console.log(categories);     
-        
+        const categoryOptions = categories.map(cat => ({
+            value: cat.name, // Use name instead of value
+            name: cat.name,
+            selected: cat.name === categoryFilter
+        }));
 
         return res.render("shop", { 
             product: productData,
             currentPage: page,
-            totalPages: totalPages,
-            categories:categories
+            totalPages,
+            categories,
+            categoryOptions,
+            selectedCategory: categoryFilter
         });
     } catch (error) {
-        console.error(`Error occurred: ${error}`);
+        console.error(error);
         return res.status(500).render("error", { message: "An error occurred while fetching products" });
     }
 };
-
-
 // const Product = require("../models/Product");
 
 // Controller function for sorting products

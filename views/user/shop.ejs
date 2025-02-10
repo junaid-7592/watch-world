@@ -256,15 +256,14 @@
 						
 							<div>
 								<h2>CATEGORY</h2>
-							 </div>
-							
-
-							<select id="sort-by" onchange="applySorting()" style="margin-bottom: 15px; width: 16rem; height: 3rem; font-size: larger;">
-								<option value="" disabled selected>Select Item</option>
-								<option value="popularity">MENS</option>
-								<option value="low-to-high">Women</option>
-								<option value="high-to-low">KIDS</option>
-								
+							</div>
+							<select id="category-select" style="margin-bottom: 15px; width: 16rem; height: 3rem; font-size: larger;">
+								<option value="all">All Categories</option>
+								<% categoryOptions.forEach(function(category) { %>
+									<option value="<%= category.value %>" <%= category.selected ? 'selected' : '' %>>
+										<%= category.name %>
+									</option>
+								<% }); %>
 							</select>
 									
 							
@@ -295,31 +294,7 @@
 							</div><!-- End Shop Layout Banner -->
 							<!-- Popular Tag Area -->
 							<div class="popular-tag-area">
-								<!-- <div class="tag-title">
-									<h2>Popular Tags</h2>
-								</div> -->
-								<!-- Shop Layout -->
-								<!-- <div class="shop-layout">
-									<div class="popular-tag">
-										<div class="tag-list">
-											<ul>
-												<li><a href="#">Clothing</a></li>
-												<li><a href="#">accessories</a></li>
-												<li><a href="#">fashion</a></li>
-												<li><a href="#">footwear</a></li>
-												<li><a href="#">good</a></li>
-												<li><a href="#">kid</a></li> -->
-												<!-- <li><a href="#">Men</a></li>
-												<li><a href="#">Women</a></li>
-											</ul>
-										</div>
-										<div class="tag-action">
-											<ul> -->
-												<!-- <li><a href="#">View all tags</a></li>
-											</ul>
-										</div>
-									</div>
-								</div>End Shop Layout -->
+								
 							</div><!-- End Popular Tag Area -->
 						</div><!-- End Left Sidebar -->
 					</div>
@@ -495,7 +470,7 @@
 				  <!-- Main JS -->
 				  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 				  <script src="assets/js/main.js"></script>
-			  	<script>
+<script>
 					function applySorting() {
     const sortBy = document.getElementById("sort-by").value;
     console.log("Selected Sorting:", sortBy);
@@ -547,6 +522,25 @@ function updateProductList(products) {
     });
 }
 
+// Frontend JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+    const categorySelect = document.getElementById('category-select');
+    
+    categorySelect.addEventListener('change', function() {
+        const selectedCategory = this.value;
+        const currentUrl = new URL(window.location.href);
+        
+        if (selectedCategory) {
+            currentUrl.searchParams.set('category', selectedCategory);
+        } else {
+            currentUrl.searchParams.delete('category');
+        }
+        
+        currentUrl.searchParams.set('page', '1');
+        window.location.href = currentUrl.toString();
+    });
+});
+
 </script>
 
 
@@ -591,6 +585,7 @@ function updateProductList(products) {
             timer: 1500
         });
     });
-}
+};
+
 
 	</script>
