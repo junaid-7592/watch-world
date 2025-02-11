@@ -254,37 +254,28 @@
               
 
             <div class="product-item">
-                <!-- <img src="/api/placeholder/80/80" alt="Product 2" class="product-image"> -->
-                <!-- <div class="product-details">
-                    <h3>Smart Watch Series 5</h3>
-                    <p>Color: Silver</p>
-                    <p>Quantity: 1</p>
-                </div> -->
-                <!-- <div class="product-price">
-                    <p>$299.99</p>
-                </div> -->
+               
             </div>
         </div>
 
         <div class="order-summary">
             <h2>Order Summary</h2>
             <div class="summary-row">
-                <span>Subtotal</span>
-                <span>$<%= order.finalAmount.toFixed(2) %></span>
+                <span>discount</span>
+                <span>$<%= order.discount %></span>
 
             </div>
-            <div class="summary-row">
+            <!-- <div class="summary-row">
                 <span>Shipping</span>
                 <span>free</span>
-            </div>
+            </div> -->
             <!-- <div class="summary-row">
                 <span>Tax</span>
                 <span>$14:35</span>
             </div> -->
             <div class="summary-row total-row">
                 <span>Total</span>
-                <!-- <span>$<%= (order.finalAmount + order.shiping + order.tax).toFixed(2) %></span> -->
-                <span>$<%= (order.finalAmount + (order.shiping || 0)).toFixed(2) %></span>
+                <span>$<%= order.totalPrice %></span>
                 
 
 
@@ -292,9 +283,12 @@
             </div>
         </div>
 
-        <div style="text-align: center; margin-top: 2rem;">
-            <a href="#" id="cancelOrder" class="btn btn-primary">Cancel</a>
-        </div>
+        <%if(order.status!='Cancelled'){%>
+            <div style="text-align: center; margin-top: 2rem;">
+                <a href="#" id="cancelOrder" class="btn btn-primary">Cancel</a>
+            </div>
+            <%}%>
+
         <div style="text-align: center; margin-top: 2rem;">
             <a href="/"  class="btn btn-primary">Back To Home</a>
         </div>
@@ -316,7 +310,7 @@
 
         // Store Order ID and Total Amount safely
         const orderId = "<%= order._id %>";
-        const totalAmount = "<%= order.finalAmount %>"; // Ensure you pass totalAmount from backend
+        const totalAmount = "<%= order.totalPrice %>"; // Ensure you pass totalAmount from backend
         console.log("this totalAmount",totalAmount)
         cancelBtn.addEventListener("click", function (e) {
             e.preventDefault();

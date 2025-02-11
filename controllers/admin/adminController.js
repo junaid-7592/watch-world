@@ -249,9 +249,11 @@ const updateCoupon = async (req, res) => {
 };
 
 
-const getSalesreport= async (req, res) => {
+const getSalesreport = async (req, res) => {
     try {
         const { reportType, startDate, endDate } = req.query;
+        const page = parseInt(req.query.page) || 1; // Current page
+        const limit = 10; // Items per page
 
         // Build date filter
         const dateFilter = {};
@@ -288,10 +290,17 @@ const getSalesreport= async (req, res) => {
             }
         }
 
+        // Calculate total documents for pagination
+        const totalDocs = await Order.countDocuments(dateFilter);
+        const totalPages = Math.ceil(totalDocs / limit);
+        const skip = (page - 1) * limit;
+
         // Fetch orders with populated product details
         const orders = await Order.find(dateFilter)
             .populate('orderedItems.product')
-            .sort({ createdAt: -1 });
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
 
         // Calculate statistics
         const totalSales = orders.reduce((sum, order) => sum + order.finalAmount, 0);
@@ -302,7 +311,17 @@ const getSalesreport= async (req, res) => {
             orders,
             totalSales,
             totalDiscounts,
-            orderCount
+            orderCount,
+            currentPage: page,
+            totalPages,
+            hasNextPage: page < totalPages,
+            hasPrevPage: page > 1,
+            nextPage: page + 1,
+            prevPage: page - 1,
+            lastPage: totalPages,
+            reportType: reportType || '',
+            startDate: startDate || '',
+            endDate: endDate || ''
         });
     } catch (error) {
         console.error('Dashboard Error:', error);

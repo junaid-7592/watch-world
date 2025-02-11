@@ -286,6 +286,9 @@
                         <h1 class="mb-3">
                             <%=product.productName %>
                         </h1>
+                        <del> <p class="price mb-3" style="color: #6c757d; ">₹<%=product.regularPrice %>
+                        </p></del>
+                        
                         <p class="price mb-3">₹<%=product.salePrice %>
                         </p>
                         <% if (product.quantity>0){ %>
@@ -309,17 +312,7 @@
                                     </div>
 
 
-                                    <!-- <div class="mb-4">
-                        <h5>Key Features</h5>
-                        <ul class="features-list">
-                            <li>Swiss automatic movement</li>
-                            <li>Sapphire crystal glass</li>
-                            <li>Water-resistant up to 100m</li>
-                            <li>Premium stainless steel case</li>
-                            <li>Genuine leather strap</li>
-                        </ul>
-                    </div> -->
-
+                           
                                     <!-- Updated quantity selector -->
                                     <div class="mb-4">
                                         <label class="form-label">Quantity</label>

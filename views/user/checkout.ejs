@@ -154,7 +154,7 @@
             <h2>Payment Method</h2> 
             <div class="payment-options">
                 <div class="payment-option">
-                    <input type="radio" id="cod" name="paymentMethod" value="cod" >
+                    <input type="radio" id="cod" name="paymentMethod" value="cod" checked >
                     <label for="cod">Cash on Delivery</label>
                 </div>
                 <div class="payment-option">
@@ -185,7 +185,7 @@
                 <select id="couponSelect" name="couponCode" class="form-control w-auto me-2">
                     <option value="">-- Select Coupon --</option>
                     <% coupons.forEach(coupon => { %>
-                        <option value="<%= coupon.code %>">
+                        <option  value="<%= coupon.code %>">
                             <%= coupon.code %> - <%= coupon.discountValue %> <%= coupon.discountType === 'percentage' ? '%' : '₹' %>
                         </option>
                     <% }) %>
@@ -196,15 +196,15 @@
         
             <div class="product-item">
                 <span>Sub Total</span>
-                <span>$<span id="subTotal"><%= subTotal.toFixed(2) %></span></span>
+                <span>₹<span id="subTotal"><%= subTotal.toFixed(2) %></span></span>
             </div>
             <div class="product-item">
                 <span>Shipping</span>
-                <span>$<span id="shippingAmount"><%= shippingAmount.toFixed(2) %></span></span>
+                <span>₹<span id="shippingAmount" value="<%= shippingAmount.toFixed(2) %>"><%= shippingAmount.toFixed(2) %></span></span>
             </div>
             <div class="product-item">
                 <span>Discount</span>
-                <span>-$<span id="discountAmount"><%= discountAmount.toFixed(2) %></span></span>
+                <span>-₹<span data-disc="<%= discountAmount.toFixed(2) %>" id="discountAmount"><%= discountAmount.toFixed(2) %></span></span>
             </div>
         
             <div class="total-section">
@@ -221,7 +221,8 @@
             document.getElementById("applyCouponBtn").addEventListener("click", function () {
                 const couponCode = document.getElementById("couponSelect").value;
                 if (!couponCode) {
-                    document.getElementById("couponMessage").innerText = "Please select a coupon.";
+                    document.getElementById("couponMessage").innerText = "Please select valid a coupon.";
+                    window.location.reload()
                     return;
                 }
         
@@ -273,73 +274,16 @@ function getpaymentMethod(){
 }
 
 
-
-// async function placeOrder(cartId, userId) {
-//     let selectedAddress = getSelectedAddress();
-//     let paymentMethod = getpaymentMethod()
-//     console.log(paymentMethod);
-    
-   
-    
-    
-//     if (!selectedAddress) {
-//         swal({
-//             title: "No Address Selected",
-//             text: "Please select an address before placing an order.",
-//             icon: "warning",
-//             button: "OK"
-//         });
-//         return;
-//     }
-
-//     try {
-//         fetch('/orderSuccess', {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/json'
-//             },
-//             body: JSON.stringify({ cartId, userId, selectedAddress,paymentMethod })
-//         })
-//         .then(response => response.json()) 
-//         .then(result => {
-//             if (result.success) {
-//                 swal({
-//                     title: "Order Placed!",
-//                     text: "Your order has been placed successfully.",
-//                     icon: "success",
-//                     button: "OK"
-//                 }).then(() => {
-//                     const orderId = result.orderId
-//                     console.log(orderId);
-                    
-//                     window.location.href = `/orderSuccess?orderId=${orderId}`;   //enna rute ilott pokan
-//                 });
-//             } else {
-//                 swal({
-//                     title: "Order Failed",
-//                     text: `Error: ${result.message}`,
-//                     icon: "error",
-//                     button: "OK"
-//                 });
-//             }
-//         })
-//         .catch(error => {
-//             console.error("Error:", error);
-//             swal({
-//                 title: "Error",
-//                 text: "Error in placing order. Please try again!",
-//                 icon: "error",
-//                 button: "OK"
-//             });
-//         });
-//     } catch (error) {
-//         console.error("Unexpected Error:", error);
-//     }
-// }
-
 async function placeOrder(cartId, userId) {
     let selectedAddress = getSelectedAddress();
     let paymentMethod = getpaymentMethod();
+    let subTotal=document.getElementById('totalAmount')
+    let subTotalvalue = subTotal.innerText.trim(); 
+    let discountElement = document.getElementById("discountAmount");
+    let discountValue = discountElement.innerText.trim(); 
+    console.log(discountValue);
+    
+    
     console.log(paymentMethod);
     
     if (!selectedAddress) {
@@ -442,7 +386,7 @@ async function placeOrder(cartId, userId) {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ cartId, userId, selectedAddress, paymentMethod })
+                body: JSON.stringify({ cartId, userId, selectedAddress, paymentMethod,discountValue,subTotalvalue })
             })
             .then(response => response.json()) 
             .then(result => {

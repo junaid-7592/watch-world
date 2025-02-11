@@ -29,21 +29,7 @@ router.post("/verify-otp", userController.verifyOtp);
 router.post("/resend-otp", userController.resendOtp);
 
 router.get("/auth/google", passport.authenticate('google', { scope: ['profile', 'email'] }));  //name email  nn edukkunnu
-// router.get("/auth/google/callback", passport.authenticate('google', {failureRedirect: '/signup'}), async (req, res) => {
-//     res.redirect('/')
-// })
-// router.get('/auth/google/callback', 
-//     passport.authenticate('google', { failureRedirect: '/signup' }),
-//     (req, res) => {
-//       if(req.error){
-//         console.log("user error ::"+req.error)
-//        return res.redirect("/signup");
-//       }
-//       req.session.user = req?.user?._id
-//       req.session.userData = req.user
-//       res.redirect('/')
-//     }
-//   );
+
 router.get('/auth/google/callback',
     (req, res, next) => {
         console.log("from google auth");

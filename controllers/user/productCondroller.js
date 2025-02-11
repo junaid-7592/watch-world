@@ -222,10 +222,8 @@ const updateTotel = async (req, res) => {
             };
         });
 
-        // Calculate Grand Total (Modify if tax/shipping needed)
         let grandTotal = subTotal;
 
-        // console.log('this is grand',itemsWithSubTotal)
 
         // Send JSON response with updated totals
         res.json({ items: itemsWithSubTotal, grandTotal });
@@ -235,19 +233,6 @@ const updateTotel = async (req, res) => {
     }
 };
 
-// const getCheckout = async (req, res) => {
-//     try {
-
-//         const userId = req.session.user;    
-//         const addressData = await Address.find({ userId }).populate("address")
-
-
-//         const cart = await Cart.findOne({ userId }).populate("items.productId");
-//         const coupons = await Coupon.find()
-        
-
-
-// const Coupon = require("../models/couponModel");
 
 const getCheckout = async (req, res) => {
     try {
@@ -311,6 +296,7 @@ const applyCoupon = async (req, res) => {
         }
 
         const coupon = await Coupon.findOne({ code: couponCode });
+        console.log("coupon-1",couponCode);
 
         if (!coupon) {
             return res.json({ success: false, message: "Invalid coupon code" });
@@ -365,85 +351,15 @@ const applyCoupon = async (req, res) => {
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
-
-
-
-
-
-
-
-// const applyCoupon = async (req, res) => {
-//     try {
-//         const { userId, couponCode } = req.body;
-
-//         // Fetch user's cart
-//         const cart = await Cart.findOne({ userId }).populate("items.productId");
-//         if (!cart) {
-//             return res.status(404).json({ success: false, message: "Cart not found" });
-//         }
-
-//         // Fetch coupon details
-//         const coupon = await Coupon.findOne({ code: couponCode, isActive: true });
-//         if (!coupon) {
-//             return res.status(400).json({ success: false, message: "Invalid or expired coupon" });
-//         }
-
-//         // Calculate Subtotal (before discount)
-//         let subTotal = cart.items.reduce((total, item) => total + item.productId.salePrice * item.quantity, 0);
-        
-//         let discountAmount = 0;
-//         if (coupon.discountType === "percentage") {
-//             discountAmount = (subTotal * coupon.discountValue) / 100;
-//             if (coupon.maxDiscount) {
-//                 discountAmount = Math.min(discountAmount, coupon.maxDiscount);
-//             }
-//         } else {
-//             discountAmount = coupon.discountValue;
-//         }
-
-//         // Ensure discount does not exceed subtotal
-//         discountAmount = Math.min(discountAmount, subTotal);
-
-//         // Calculate subtotal after discount
-//         let discountedTotal = subTotal - discountAmount;
-
-//         // Apply shipping logic
-//         let shippingAmount = 0;
-//         if (discountedTotal >= 1000) {
-//             shippingAmount = 0;  // Free shipping
-//         } else if (discountedTotal >= 500) {
-//             shippingAmount = 30; // ₹30 shipping
-//         } else {
-//             shippingAmount = 50; // ₹50 shipping
-//         }
-
-//         // Calculate Final Total
-//         let total = discountedTotal + shippingAmount;
-
-//         // Store the applied coupon in the database
-//         cart.appliedCoupon = couponCode;
-//         await cart.save();
-
-//         return res.json({
-//             success: true,
-//             subTotal,
-//             discountAmount,
-//             shippingAmount,
-//             total,
-//             message: "Coupon applied successfully!"
-//         });
-
-//     } catch (error) {
-//         console.error("Error applying coupon:", error);
-//         res.status(500).json({ success: false, message: "Internal Server Error" });
-//     }
-// };
-       
       
 
 const OrderSuccess = async (req, res) => {
+    console.log("------->OrderSuccess");
+    
     try {
-        const { userId, cartId, selectedAddress,paymentMethod } = req.body;
+        const { userId, cartId, selectedAddress,paymentMethod,discountValue,subTotalvalue} = req.body;
+        console.log({ userId, cartId, selectedAddress,paymentMethod,discountValue,subTotalvalue});
+        
        
         if (!userId || typeof userId !== 'string' || userId.trim().length === 0) {
             return res.status(400).json({ success: false, message: "use valid user ID ." });
@@ -468,17 +384,16 @@ const OrderSuccess = async (req, res) => {
             if (product.stock <= 0) {
                 return res.status(400).json({ success: false, message: `Item ${product.name} out of stock .` });
             }
-
-            totalAmount += product.salePrice * item.quantity;
+            
+            
             updatedItems.push({ product: product._id, price: product.salePrice, quantity: item.quantity });
 
             // Stock reduce cheyyuka 
             product.stock -= item.quantity;
             await product.save();
         }
-        //   console.log(totalAmount)
-        // (4) **Minimum Order Amount Check**
-        if (totalAmount < 150) {
+     
+        if (subTotalvalue < 150) {
             return res.status(400).json({ success: false, message: "Minimum order ₹150 ." });
         }
         const selectedAddressId = new mongoose.Types.ObjectId(selectedAddress);
@@ -502,8 +417,9 @@ const OrderSuccess = async (req, res) => {
         const newOrder = new Order({
             userId,
             orderedItems: updatedItems,
-            totalPrice:totalAmount,
-            finalAmount:totalAmount,
+            discount:discountValue,
+            totalPrice:subTotalvalue,
+            finalAmount:subTotalvalue,
             status:"Processing",
             address:orderAddress ,
             paymentMethod:paymentMethod,
@@ -520,7 +436,7 @@ const OrderSuccess = async (req, res) => {
 
     } catch (error) {
         console.error("Error:", error);
-        res.status(500).json({ success: false, message: "Please Select Payment Method" });
+        res.status(500).json({ success: false, message: "somethig went worng"});
     }
 };
 
@@ -566,7 +482,7 @@ const cancelOrder= async (req, res) => {
         // Check if the order is already delivered
         if (order.status === "Delivered") {
             return res.status(400).json({ success: false, message: "Cannot cancel a delivered order" });
-        }
+        }    
 
         // Update the order status to "Cancelled"
         order.status = "Cancelled";
