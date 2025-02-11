@@ -304,7 +304,7 @@ async function placeOrder(cartId, userId) {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({amount : 500 })  // Replace with actual amount
+                body: JSON.stringify({amount : subTotalvalue })  // Replace with actual amount
             });
 
             let orderData = await response.json();
@@ -332,7 +332,9 @@ async function placeOrder(cartId, userId) {
                             userId, 
                             selectedAddress, 
                             paymentMethod,
-                            paymentId: response.razorpay_payment_id
+                            paymentId: response.razorpay_payment_i,
+                            subTotalvalue
+
                         })
                     })
                     .then(res => res.json())

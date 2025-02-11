@@ -381,7 +381,7 @@ const OrderSuccess = async (req, res) => {
             if (!product) {
                 return res.status(400).json({ success: false, message: `Item ${item.productId} not available product` });
             }
-            if (product.stock <= 0) {
+            if (product.quantity <= 0) {
                 return res.status(400).json({ success: false, message: `Item ${product.name} out of stock .` });
             }
             
@@ -389,7 +389,7 @@ const OrderSuccess = async (req, res) => {
             updatedItems.push({ product: product._id, price: product.salePrice, quantity: item.quantity });
 
             // Stock reduce cheyyuka 
-            product.stock -= item.quantity;
+            product.quantity -= item.quantity;
             await product.save();
         }
      
@@ -428,6 +428,8 @@ const OrderSuccess = async (req, res) => {
 
         await newOrder.save();
 
+        const product = await Product.find()
+
         // (6) **Delete User Cart After Order**
         await Cart.deleteOne({ userId });
 
@@ -436,7 +438,7 @@ const OrderSuccess = async (req, res) => {
 
     } catch (error) {
         console.error("Error:", error);
-        res.status(500).json({ success: false, message: "somethig went worng"});
+        res.status(500).json({ success: false, message: "somethig went wrong"});
     }
 };
 
@@ -469,29 +471,66 @@ const getOrderSuccess = async (req, res) => {
 };
 
 
-const cancelOrder= async (req, res) => {
+const cancelOrder = async (req, res) => {
     try {
         const { orderId } = req.params;
-        // console.log("111111.canselation id:",orderId)
         const order = await Order.findById(orderId);
-        // console.log("2222222.canselation:",order)
+
         if (!order) {
-            return res.status(404).json({ success: false, message: "Order not found" });
+            return res.status(404).json({ 
+                success: false, 
+                message: "Order not found" 
+            });
         }
 
         // Check if the order is already delivered
         if (order.status === "Delivered") {
-            return res.status(400).json({ success: false, message: "Cannot cancel a delivered order" });
-        }    
+            return res.status(400).json({ 
+                success: false, 
+                message: "Cannot cancel a delivered order" 
+            });
+        }
+
+        // Check if order is already cancelled
+        if (order.status === "Cancelled") {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Order is already cancelled" 
+            });
+        }
+
+        // Increment product quantities back to stock
+        for (const item of order.orderedItems) {
+            const product = await Product.findById(item.product);
+            
+            if (product) {
+                // Increment the product quantity
+                product.quantity += item.quantity;
+                
+                // Update product status if it was out of stock
+                if (product.status === "out of stock" && product.quantity > 0) {
+                    product.status = "Available";
+                }
+                
+                await product.save();
+            }
+        }
 
         // Update the order status to "Cancelled"
         order.status = "Cancelled";
         await order.save();
 
-        res.json({ success: true, message: "Order cancelled successfully" });
+        res.json({ 
+            success: true, 
+            message: "Order cancelled successfully and stock updated" 
+        });
+
     } catch (error) {
         console.error("Error cancelling order:", error);
-        res.status(500).json({ success: false, message: "Internal server error" });
+        res.status(500).json({ 
+            success: false, 
+            message: "Internal server error" 
+        });
     }
 };
 
