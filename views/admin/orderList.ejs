@@ -1,121 +1,6 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Order List</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <div class="container">
-        <h2>Admin Order List</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Order ID</th>
-                    <th>Product</th>
-                    <th>Quantity</th>
-                    <th>Price</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>#12345</td>
-                    <td>Product A</td>
-                    <td>2</td>
-                    <td>$50</td>
-                    <td>
-                        <select class="status-dropdown" onchange="validateStatus(this)">
-                            <option value="pending">Pending</option>
-                            <option value="shipped">Shipped</option>
-                            <option value="delivered">Delivered</option>
-                            <option value="canceled">Canceled</option>
-                        </select>
-                    </td>
-                    <td><button class="cancel-btn" onclick="cancelOrder(this)">Cancel Order</button></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <script>
-        function validateStatus(selectElement) {
-            let selectedValue = selectElement.value;
-            let cancelButton = selectElement.closest('tr').querySelector('.cancel-btn');
-            
-            if (selectedValue === 'delivered') {
-                cancelButton.disabled = true;
-            } else {
-                cancelButton.disabled = false;
-            }
-
-            if (selectedValue === 'canceled') {
-                selectElement.disabled = true;
-            }
-        }
-
-        function cancelOrder(button) {
-            let row = button.closest('tr');
-            let statusDropdown = row.querySelector('.status-dropdown');
-            
-            if (statusDropdown.value === 'delivered') {
-                alert("Delivered orders cannot be canceled!");
-                return;
-            }
-            
-            statusDropdown.value = 'canceled';
-            statusDropdown.disabled = true;
-            button.disabled = true;
-        }
-    </script>
-</body>
-</html>
-
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
-        padding: 20px;
-    }
-    .container {
-        max-width: 800px;
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        margin: auto;
-    }
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    th, td {
-        padding: 10px;
-        border: 1px solid #ddd;
-        text-align: center;
-    }
-    select, button {
-        padding: 5px;
-        font-size: 16px;
-    }
-    button {
-        background-color: red;
-        color: white;
-        border: none;
-        cursor: pointer;
-        padding: 5px 10px;
-        border-radius: 5px;
-    }
-    button:disabled {
-        background-color: grey;
-        cursor: not-allowed;
-    }
-</style> -->
 
 
-<!DOCTYPE html>
-<html lang="en">
+<%- include("../../views/partials/admin/header") %>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -130,7 +15,7 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f6f8;
-            padding: 20px;
+            padding: 0px;
         }
 
         .container {

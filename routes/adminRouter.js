@@ -18,7 +18,11 @@ router.get("/pageerror",adminController.pageerror);
 router.get("/login",adminController.loadlogin);
 router.post("/login",adminController.login);
 router.get("/logout",adminController.logout);
-router.get("/",adminAuth,adminController.loadDashboard);
+
+router.get('/', adminAuth,adminController.loadDashboard);
+router.post('/export-pdf', adminController.exportPDF);
+router.post('/export-excel', adminController.exportExcel);
+
 router.get("/users",adminAuth,customerController.customerInfo);
 router.get("/blockCustomer",adminAuth,customerController.customerBlocked);
 router.get("/unblockCustomer",adminAuth,customerController.customerunBlocked);
@@ -72,6 +76,11 @@ router.post("/coupons",adminAuth,adminController.newCouponAdd)
 router.get("/updateCoupon/:id",adminAuth,adminController.lodeUpdateCoupon)
 router.put("/Updatecoupons",adminAuth,adminController.updateCoupon)
 
+
+router.get("/sales",adminAuth,adminController.getSalesreport)
+router.post('/fetch-sales-report',adminAuth,adminController.fetchSalesReport);
+router.get('/export-pdf',adminAuth,adminController. exportPDF);
+router.get('/export-excel', adminAuth,adminController.exportExcel);
 
 module.exports=router;
                                     
