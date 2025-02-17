@@ -29,10 +29,6 @@ const orderSchema = new Schema({
     type: Number,
     default: 0
   },
-  // couponDiscount: {
-  //   type: Number,
-  //   default: 0
-  // },
  finalAmount : {
     type: Number,
     required: true
@@ -51,17 +47,32 @@ const orderSchema = new Schema({
   status: {
     type: String,
     required: true,
-    enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled", "Return Request", "Returned"]
+    enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled", "Return-Request", "Returned"]
   },
   paymentStatus: {
     type: String,
-    enum: ["paid", "unpaid",]
+    enum: ["paid", "unpaid"]
   },
 
+  cancelReason:{
+type:String,
+default:null
+  },
+  returnReason:{
+    type:String,
+    default:null
+      },
+      refundStatus:{
+        type:String,
+        enum:["Approved","Reject"]
+      },
   coupenApplied: {
     type: Boolean,
     default: false
 
+  },
+  couponCode: {
+    type:String,
   }
 }, {
   timestamps: true

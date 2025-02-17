@@ -3,6 +3,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Order Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <style>
         * {
             margin: 0;
@@ -187,7 +188,7 @@
             </div>
             <div class="info-item">
                 <label>Discount</label>
-                <div>00</div>
+                <div>₹<%= order.discount %></div>
             </div>
             <div class="info-item">
                 <label>Payment Method</label>
@@ -197,15 +198,19 @@
                 <label>Payment Status</label>
                 <div><%=order.status%></div>
             </div>
+            <%if(order.couponCode){%>
+                <div class="info-item">
+                    <label>Coupon Code</label>
+                    <div><%=order.couponCode%></div>
+                </div>
+            <%}%>
         </div>
 
         <!-- Shipping Address -->
         <div class="shipping-address">
             <div class="section-title">Shipping Address</div>
             <div class="info-item">
-                <!-- <label>Name</label>
-                <div>John Doe</div>
-            </div> -->
+               
             <div class="info-item">
                 <label>Address</label>
                 <div><%=order.address  %></div>
@@ -233,10 +238,10 @@
                             <td><%=item?.product?.productName %></td>
                             <td><img style="width: 100px; height: 100px;" src="<%=item.product.productImage[0]%>"></td>
                             
-                            <td><%= item?.product?.quantity %></td>
-                            <td>$<%= item?.product?.salePrice?.toFixed(2) %></td>
-                            <td>$<%= (item?.product?.quantity*item.product.salePrice).toFixed(2) %></td>
-                            <td class="delivered"><%= order?.status %></td>
+                            <td><%= item.quantity %></td>
+                            <td>₹<%= item.price.toFixed(2) %></td>
+                            <td>₹<%= order.totalPrice.toFixed(2) %></td>
+                            <td class="delivered"><%= order.status %></td>
                         </tr>
                         <% }) %>
                         
@@ -244,6 +249,12 @@
                     
                 </tbody>
             </table>
+
+           <% if (order.status == "Cancelled") { %>
+            <label for="cancelResone">cancel Resone</label>
+            <input type="text" value="<%= order.cancelReason %>" readonly>
+            
+           <% } %>
         </div>
 
         
@@ -266,10 +277,28 @@
                     Cancel Order
                 </button>
             </div>
+            <% if (order.status === "Return-Request") { %>
+                <!-- Return Request Section -->
+
+                <div id="return" style="padding-top: 50px;">
+                <form id="returnReasonForm" action="admin/order/<%= order._id %>/returnstatus" method="POST">
+                  <div class="return-reason-section mt-4">
+                    <h5>Return Request</h5>
+                    <p><strong>Reason:</strong> <%= order.returnReason
+                         %></p>
+                    <div class="form-actions">
+                      <button type="submit" name="action" value="approve" class="btn btn-success">Approve</button>
+                      <button type="submit" name="action" value="reject" class="btn btn-danger">Reject</button>
+                    </div>
+                  </div>
+                </form>
+                </div>
+                <%}%>
         </div>
         
         <!-- Add this script section at the bottom of your EJS file -->
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
         <script>
         async function updateOrderStatus(orderId) {
             const newStatus = document.getElementById('orderStatus').value;
@@ -353,6 +382,69 @@
                 });
             }
         }
+
+
+// ----------------------------------------------------
+
+ const form = document.getElementById('returnReasonForm');
+form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const orderId = '<%= order._id %>';
+    const actionButton = document.querySelector('button[name="action"]:focus');
+    const action = actionButton?.value;
+
+    if (!action) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Action Missing',
+            text: 'No action was selected (Approve/Reject). Please try again.',
+            confirmButtonText: 'Ok',
+        });
+        return;
+    }
+    console.log(action)
+
+    try {
+        const response = await fetch(`/admin/order/${orderId}/returnstatus`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ action }),
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Return Request Status Updated',
+                text: data.message,
+                confirmButtonText: 'Ok',
+            }).then(() => {
+                window.location.reload();
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: data.message,
+                confirmButtonText: 'Ok',
+            });
+        }
+    } catch (error) {
+        console.error(error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'An error occurred while updating the return request status.',
+            confirmButtonText: 'Ok',
+        });
+    }
+});
+
+
+
         </script>
        
 

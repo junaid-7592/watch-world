@@ -9,7 +9,9 @@ const userRouter = require("./routes/userRouter");
 const adminRouter=require("./routes/adminRouter");
 const userlog = require("./middlewares/userlogin");
 const flash = require('connect-flash');
+const nocache = require('nocache');
 
+app.use(nocache());
 
 
 db();
@@ -37,6 +39,7 @@ app.use(flash());
 //passport initialise
 app.use(passport.initialize())
 app.use(passport.session());
+
 
 app.use((req,res,next)=>{
   res.set('cache-control','no-store')

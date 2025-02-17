@@ -129,7 +129,7 @@
                     <th>ID</th>
                     <th>Order ID</th>
                     <th>Date</th>
-                    <!-- <th>Customer Name</th> -->
+                    <th>discount</th>
                     <th>Total Amount</th>
                     <th>Payment Method</th>
                     <th>Status</th>
@@ -140,30 +140,34 @@
                 <%orders%>
                 <% orders.forEach((order, index) => { %>
                 <tr>
-                    <td><%= index + 1 %></td>
+                    <td><%= (currentPage - 1) * 10 + index + 1 %></td>
+                    
                     <td>ORD-2025-<%= order._id %></td> 
                     <td><%= new Date(order.createdAt).toDateString() %></td>
-                    <!-- <td>ORD-2025-001</td> -->
-                    <!-- <td>2025-02-01</td> -->
-                    <!-- <td>John Doe</td> -->
+                    <td><%= order.discount %></td>
                     <td><%=order.totalPrice%></td>
                     <td><span class="payment-method cod"></span><%= order.paymentMethod  %></td>
                     <td><span class="status pending"><%=order.status%></span></td>
                     <td><a href="/admin/viewOrderdetails/<%= order._id %>" class="view-btn">View</a></td>
                 </tr>
                 <% }) %>
-                <!-- <tr>
-                    <td>#2</td>
-                    <td>ORD-2025-002</td>
-                    <td>2025-02-01</td>
-                    <td>Jane Smith</td>
-                    <td>$549.99</td>
-                    <td><span class="payment-method online">Online Payment</span></td>
-                    <td><span class="status paid">Paid</span></td>
-                    <td><a href="#" class="view-btn">View</a></td>
-                </tr> -->
             </tbody>
         </table>
+                <!-- Pagination -->
+                <div class="pagination">
+                    <% if (currentPage > 1) { %>
+                        <a href="?page=<%= currentPage - 1 %>">Previous</a>
+                    <% } %>
+        
+                    <span>Page <%= currentPage %> of <%= totalPages %></span>
+        
+                    <% if (currentPage < totalPages) { %>
+                        <a href="?page=<%= currentPage + 1 %>">Next</a>
+                    <% } %>
+                </div>
+            </div>
+        </body>
+        
     </div>
 </body>
 </html>

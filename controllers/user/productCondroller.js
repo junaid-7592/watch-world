@@ -354,11 +354,14 @@ const applyCoupon = async (req, res) => {
       
 
 const OrderSuccess = async (req, res) => {
-    console.log("------->OrderSuccess");
+    // console.log("------->OrderSuccess");
     
     try {
-        const { userId, cartId, selectedAddress,paymentMethod,discountValue,subTotalvalue} = req.body;
-        console.log({ userId, cartId, selectedAddress,paymentMethod,discountValue,subTotalvalue});
+        const { userId, cartId, selectedAddress,paymentMethod,discountValue,subTotalvalue, couponCode} = req.body;
+        // console.log("ths is order fdsxghf",req.body);
+        
+
+        // console.log({ userId, cartId, selectedAddress,paymentMethod,discountValue,subTotalvalue});
         
        
         if (!userId || typeof userId !== 'string' || userId.trim().length === 0) {
@@ -419,11 +422,13 @@ const OrderSuccess = async (req, res) => {
             orderedItems: updatedItems,
             discount:discountValue,
             totalPrice:subTotalvalue,
+            paymentStatus:"unpaid",
             finalAmount:subTotalvalue,
             status:"Processing",
             address:orderAddress ,
             paymentMethod:paymentMethod,
-            
+            coupenApplied:couponCode?true:false,
+            couponCode:couponCode
         });
 
         await newOrder.save();
@@ -472,8 +477,14 @@ const getOrderSuccess = async (req, res) => {
 
 
 const cancelOrder = async (req, res) => {
+    
     try {
+        console.log("cancelOrder-------->>>>>>");
         const { orderId } = req.params;
+      const cancelReson= req.body.reason
+      console.log("cance reson",cancelReson);
+      
+      
         const order = await Order.findById(orderId);
 
         if (!order) {
@@ -518,6 +529,7 @@ const cancelOrder = async (req, res) => {
 
         // Update the order status to "Cancelled"
         order.status = "Cancelled";
+        order.cancelReason=cancelReson;
         await order.save();
 
         res.json({ 
@@ -598,26 +610,7 @@ const razorpay = new Razorpay({
       }
   };
   
-  // Remove product from wishlist
-//   exports.removeFromWishlist = async (req, res) => {
-//       try {
-//           const { productId } = req.body;
-//           const userId = req.user.id;
   
-//           const wishlist = await Wishlist.findOneAndUpdate(
-//               { userId },
-//               { $pull: { products: { productId } } },
-//               { new: true }
-//           );
-  
-//           res.json({ success: true, message: 'Removed from wishlist' });
-//       } catch (error) {
-//           res.status(500).json({ error: 'Failed to remove from wishlist' });
-//       }
-//   };
-  
-   // **Remove product from wishlist**
-
    const removeFromWishlist = async (req, res) => {
     try {
         const { productId } = req.body;
@@ -676,7 +669,35 @@ const removeInWhishlist= async (req, res) => {
     }
 };
 
+const returnOrder = async (req, res) => {
+    try {
+        // console.log("Return controller------", req.body);
+        const { orderId, reason } = req.body;
 
+        if (!orderId || !reason) {
+            return res.status(400).json({ success: false, message: "Order ID and reason are required." });
+        }
+
+        // Find the order by ID
+        const order = await Order.findById(orderId);
+
+        if (!order) {
+            return res.status(404).json({ success: false, message: "Order not found." });
+        }
+
+        // Update the order with reason and change status
+        order.status = "Return-Request";
+        order.returnReason = reason;
+
+        await order.save();
+
+        res.status(200).json({ success: true, message: "Return request submitted successfully." });
+
+    } catch (error) {
+        console.error("Error in order return:", error);
+        res.status(500).json({ success: false, message: "Error processing return request." });
+    }
+};
 
 
 
@@ -698,4 +719,5 @@ module.exports = {
     addToWishlist,
     removeFromWishlist,
     removeInWhishlist,
+    returnOrder,
 }

@@ -31,15 +31,24 @@ const login = async (req, res) => {
         const { email, password } = req.body;
         console.log(password)
         const admin = await User.findOne({ email, isAdmin: true });
-        // console.log(admin);
+        console.log(admin);
 
         if (admin) {
             const passwordMarch = await bcrypt.compare(password, admin.password)
-
-
+            console.log("password : ", passwordMarch);
 
             if (passwordMarch) {
-                req.session.admin = true;
+                // req.session.admin = true;
+                console.log("email : ",admin.email);
+                
+
+                req.session.admin = {
+                    email: admin.email,
+                    name: admin.name,
+                    phone: admin.phone
+                }; 
+                console.log("admin : ", req.session.admin);
+
                 return res.redirect('/admin')
             } else {
                 // return res.redirect("/login")
@@ -60,12 +69,12 @@ const login = async (req, res) => {
 
 
 
-const loadDashboard=async(req,res)=>{
-    if(req.session.admin){
+const loadDashboard = async (req, res) => {
+    if (req.session.admin) {
         try {
             res.render("dashbord");
         } catch (error) {
-          res.redirect("/pageerror")  
+            res.redirect("/pageerror")
         }
     }
 

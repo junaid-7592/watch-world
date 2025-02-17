@@ -33,6 +33,9 @@ const transactionSchema = new mongoose.Schema({
       type: Date,
       default: Date.now,
     },
+    // paymentStatus:{
+
+    // },
     status: {
       type: String,
       enum: ['success', 'failed'],

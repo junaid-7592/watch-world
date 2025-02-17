@@ -198,7 +198,7 @@
                 <div>
                     <span class="order-status"><%= order.status %></span>
                 
-                    <% if (order.status === "Delivered" || order.paymentMethod === "onlinepayment") { %>
+                    <% if (order.status === "Delivered" || order.paymentMethod === "onlinepayment" || order.status === "Return-Request") { %>
                         <span class="payment-status" style="color: green;">Paid</span>
                     <% } else { %>
                         <span class="payment-status" style="color: red;">Unpaid</span>
@@ -221,7 +221,7 @@
         
             </div>
 
-            <% console.log("Order Data in EJS:", order) %>
+            
             <div class="info-group">
                 <h3>Payment Method</h3>
                 <p><%= order.paymentMethod  %></p>
@@ -262,7 +262,7 @@
             <h2>Order Summary</h2>
             <div class="summary-row">
                 <span>discount</span>
-                <span>$<%= order.discount %></span>
+                <span>₹<%= order.discount %></span>
 
             </div>
             <!-- <div class="summary-row">
@@ -275,7 +275,7 @@
             </div> -->
             <div class="summary-row total-row">
                 <span>Total</span>
-                <span>$<%= order.totalPrice %></span>
+                <span>₹<%= order.totalPrice %></span>
                 
 
 
@@ -283,11 +283,23 @@
             </div>
         </div>
 
-        <%if(order.status!='Cancelled'){%>
+        <%if(order.status!=='Cancelled' && order.status!=="Delivered"&&order.status!=="Return-Request"){%>
             <div style="text-align: center; margin-top: 2rem;">
                 <a href="#" id="cancelOrder" class="btn btn-primary">Cancel</a>
             </div>
+            
             <%}%>
+
+            <%if(order.status=="Delivered"){%>
+                <div style="text-align: center; margin-top: 2rem;">
+                    <a href="#" id="returnOrder" class="btn btn-success">Return</a>
+                </div>
+                
+                <%}%>
+
+              
+                
+            
 
         <div style="text-align: center; margin-top: 2rem;">
             <a href="/"  class="btn btn-primary">Back To Home</a>
@@ -305,64 +317,149 @@
 
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const cancelBtn = document.getElementById("cancelOrder");
+   document.addEventListener("DOMContentLoaded", function () {
+    const cancelBtn = document.getElementById("cancelOrder");
 
-        // Store Order ID and Total Amount safely
-        const orderId = "<%= order._id %>";
-        const totalAmount = "<%= order.totalPrice %>"; // Ensure you pass totalAmount from backend
-        console.log("this totalAmount",totalAmount)
-        cancelBtn.addEventListener("click", function (e) {
-            e.preventDefault();
+    // Store Order ID and Total Amount safely
+    const orderId = "<%= order._id %>";
+    const totalAmount = "<%= order.totalPrice %>";
+    console.log("this totalAmount", totalAmount);
 
-            Swal.fire({
-                title: "Are you sure?",
-                text: "Do you really want to cancel this order?",
-                icon: "warning",
+    cancelBtn.addEventListener("click", async function (e) {
+        e.preventDefault();
+
+        try {
+            const reasonResult = await Swal.fire({
+                title: 'Cancel Order',
+                input: 'textarea',
+                inputLabel: 'Reason for Cancel',
+                inputPlaceholder: 'Please provide a reason for returning this order...',
+                inputAttributes: {
+                    'aria-label': 'Cancel reason'
+                },
                 showCancelButton: true,
-                confirmButtonColor: "#d33",
-                cancelButtonColor: "#3085d6",
-                confirmButtonText: "Yes, cancel it!"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    console.log(111111111111111111)
-                    // First API call to cancel the order
-                    fetch(`/order/cancel/${orderId}`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ orderId: orderId,amount:totalAmount })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            console.log(22222222222222)
-                            // Second API call to refund
-                            return fetch(`/refund/${orderId}`, {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({ orderId: orderId,amount: totalAmount})
-                            });
-
-                        } else {
-                            throw new Error(data.message);
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(refundData => {
-                        if (refundData.success) {
-                            console.log(33333333333333)
-                            Swal.fire("Cancelled!", "Your order has been cancelled and refunded.", "success")
-                            .then(() => location.reload()); // Refresh page
-                        } else {
-                            throw new Error(refundData.message);
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error:", error);
-                        Swal.fire("Error!",  "llll3333335555Something went wrong.", "error");
-                    });
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'You need to provide a reason for cancel!';
+                    }
                 }
             });
-        });
+
+            if (reasonResult.isConfirmed && reasonResult.value) {
+                
+                const cancelResponse = await fetch(`/order/cancel/${orderId}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                        orderId: orderId, 
+                        amount: totalAmount,
+                        reason: reasonResult.value 
+                    })
+                });
+
+                const cancelData = await cancelResponse.json();
+
+                if (!cancelData.success) {
+                    throw new Error(cancelData.message || 'Failed to cancel order');
+                }
+
+                
+                const refundResponse = await fetch(`/refund/${orderId}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                        orderId: orderId,
+                        amount: totalAmount
+                    })
+                });
+
+                const refundData = await refundResponse.json();
+
+                if (!refundData.success) {
+                    throw new Error(refundData.message || 'Failed to process refund');
+                }
+
+                // Show success message and reload
+                await Swal.fire(
+                    "Cancelled!", 
+                    "Your order has been cancelled and refunded.", 
+                    "success"
+                );
+                
+                location.reload();
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            await Swal.fire(
+                "Error!", 
+                error.message || "Something went wrong!", 
+                "error"
+            );
+        }
     });
+});
+
+
+// .....................................................
+document.addEventListener("DOMContentLoaded", function () {
+    const returnBtn = document.getElementById("returnOrder");
+    const orderId = "<%= order._id %>";
+
+    returnBtn.addEventListener("click", async function (e) {
+        e.preventDefault();
+
+        try {
+            const reasonResult = await Swal.fire({
+                title: "Return Order",
+                input: "textarea",
+                inputLabel: "Reason for Return",
+                inputPlaceholder: "Please provide a reason for returning this order...",
+                inputAttributes: {
+                    "aria-label": "return reason"
+                },
+                showCancelButton: true,
+                inputValidator: (value) => {
+                    if (!value) {
+                        return "You need to provide a reason for return!";
+                    }
+                }
+            });
+
+            if (reasonResult.isConfirmed && reasonResult.value) {
+                const response = await fetch(`/order/return`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                        orderId: orderId, 
+                        reason: reasonResult.value 
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    await Swal.fire(
+                        "Success!",
+                        result.message || "Return request submitted successfully.",
+                        "success"
+                    );
+
+                    // Optionally, reload the page or update UI
+                    location.reload(); 
+                } else {
+                    throw new Error(result.message || "Failed to process return request.");
+                }
+            }
+
+        } catch (error) {
+            console.error("Error:", error);
+            await Swal.fire(
+                "Error!", 
+                error.message || "Something went wrong!", 
+                "error"
+            );
+        }
+    });
+});
+
 </script>

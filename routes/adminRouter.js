@@ -13,11 +13,23 @@ const upload = require("../config/multer");
 
 
 
-
-router.get("/pageerror",adminController.pageerror);
-router.get("/login",adminController.loadlogin);
-router.post("/login",adminController.login);
-router.get("/logout",adminController.logout);
+router.get("/pageerror", adminController.pageerror);
+router.get("/login", (req, res) => {
+    if (req.session.admin) {
+        return res.redirect('/admin/');
+    }
+    return adminController.loadlogin(req, res);
+});
+router.post("/login", adminController.login); 
+router.get("/logout", (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.log("Logout error:", err);
+            return res.redirect('/pageerror');
+        }
+        res.redirect('/admin/login');
+    });
+});
 
 router.get('/', adminAuth,adminController.loadDashboard);
 router.post('/export-pdf', adminController.exportPDF);
@@ -68,6 +80,7 @@ router.get("/viewOrderdetails/:id",adminAuth,orderController.getViewOrderdetails
  
 router.put("/orders/update-status/:orderId", adminAuth, orderController.updateStatus);  // fetch(`/update-status/orders/${orderId}/
 router.put("/orders/cancel-status/:orderId",adminAuth,orderController.canselOrder)
+router.put("/order/:orderId/returnstatus",adminAuth,orderController.returnstatus)
 
 router.get("/coupenManagmentlist",adminAuth,adminController.coupenManagmentListget);
 router.get("/addCoupon",adminAuth,adminController.addNewCoupon)
@@ -82,5 +95,5 @@ router.post('/fetch-sales-report',adminAuth,adminController.fetchSalesReport);
 router.get('/export-pdf',adminAuth,adminController. exportPDF);
 router.get('/export-excel', adminAuth,adminController.exportExcel);
 
-module.exports=router;
+module.exports=router; 
                                     

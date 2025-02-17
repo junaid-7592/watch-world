@@ -163,19 +163,34 @@ const userProfile=async(req,res)=>{
     
 //mukalil  import cheytha  oro  scheemayum  profile page load akumbol acces cheyth edukkan vendi
     const userId=req.session.user;
+    const page = parseInt(req.query.page) || 1;
+    const limit = 7; 
+    const skip = (page - 1) * limit;
+
     console.log(userId)
     const userData=await User.findById(userId)
     const AddressData=await Address.findOne({userId : userId});
+       // Get orders with pagination and sorting
+       const totalOrders = await Order.countDocuments({ userId });
+       const totalPages = Math.ceil(totalOrders / limit);
+
     const orders = await Order.find({userId})
+    .sort({ createdAt: -1 }) // Sort by creation date in descending order
+            .skip(skip)
+            .limit(limit);
+
     // console.log( " this order details of ",orders)
 
     console.log(orders)
-     res.render('profile',{
-      user:userData,
-      userAddress:AddressData,
-      orders:orders   
-    })
-
+    res.render('profile', {
+      user: userData,
+      userAddress: AddressData,
+      orders: orders,
+      currentPage: page,
+      totalPages: totalPages,
+      hasNextPage: page < totalPages,
+      hasPreviousPage: page > 1
+  });
   } catch (error) {
     console.error("Error for retrive profile data",error)
     res.redirect("/pageNotFound")
@@ -444,58 +459,7 @@ const orderViewLoad = async (req, res) => {
 };
 
 
-// const deleteAddress=async(req,res)=>{
-//   try {
-//  const addressId=req.query.id;
-//  const findAddress=await Address.findOne({"address._id":addressId});
-//  if(!findAddress){
-//   return res.status(400).send("address not found")
-//  }  
-
-//  await Address.updateOne({
-//   "address._id":addressId,
-
-//  },{$pull:{address:{_id:addressId,}}})
-//  res.redirect("/profile")
-
-//   } catch (error) {
-//    console.error("Error in delete address",error) 
-//    res.redirect("pageNotFound")
-//   }
-// }
-
-     
-
-
-// const deleteAddress = async (req, res) => {
-//   try {
-//     const addressId = req.query.id;
-//     console.log("8888888888888111111",addressId)
-     
-//     if (!addressId) {
-//       return res.status(400).json({ success: false, message: "Address ID is required" });
-//     }
-
-//     // Find if the address exists inside the user document
-//     const findAddress = await Address.findOne({ "address._id": addressId });
-
-//     if (!findAddress) {
-//       return res.status(404).json({ success: false, message: "Address not found" });
-//     }
-
-//     // Remove the address from the array
-//     await Address.updateOne(
-//       { "address._id": addressId },
-//       { $pull: { address: { _id: addressId } } }
-//     );
-
-//     return res.json({ success: true, message: "Address deleted successfully" });
-
-//   } catch (error) {
-//     console.error("Error in delete address:", error);
-//     return res.status(500).json({ success: false, message: "Internal server error" });
-//   }
-// };
+// 
 const deleteAddress = async (req, res) => {
   try {
     const addressId = req.query.id;
@@ -586,5 +550,4 @@ module.exports={
       orderViewLoad,
       addresspageShow,
       postaddressAdd,
-
 }             

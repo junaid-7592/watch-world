@@ -80,7 +80,7 @@ const refundToWallet = async (req, res) => {
         console.log('user'+userId)// Getting user ID from the request parameters
         
         const wallet = await Wallet.findOne({ userId });
-        const transactions = await Transaction.find({ userId });
+        const transactions = await Transaction.find({ userId }).sort({date:-1});
         console.log(wallet,transactions)
         console.log("jjjjjjjjjjjjj")
         if (!wallet) {

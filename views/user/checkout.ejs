@@ -191,9 +191,10 @@
                     <% }) %>
                 </select>
                 <button id="applyCouponBtn" class="btn btn-primary">Apply</button>
+
             </div>
             <p id="couponMessage" style="color: red; margin-top: 5px;"></p>
-        
+            <p><a href="/checkout" id="copcancelbtn"></a></p>
             <div class="product-item">
                 <span>Sub Total</span>
                 <span>₹<span id="subTotal"><%= subTotal.toFixed(2) %></span></span>
@@ -214,15 +215,17 @@
                 </div>
             </div>
         
-            <button id="orderplaced" onclick="placeOrder('<%= cart._id %>', '<%= cart.userId %>')" class="place-order-btn">Place Order</button>
+            <button id="orderplaced" onclick="placeOrder('<%= cart._id %>', '<%= cart.userId %>',)" class="place-order-btn">Place Order</button>
         </div>
         
         <script>
             document.getElementById("applyCouponBtn").addEventListener("click", function () {
                 const couponCode = document.getElementById("couponSelect").value;
+                console.log(couponCode);
+                
                 if (!couponCode) {
                     document.getElementById("couponMessage").innerText = "Please select valid a coupon.";
-                    window.location.reload()
+                    // window.location.reload()
                     return;
                 }
         
@@ -240,6 +243,8 @@
                         document.getElementById("totalAmount").innerText = data.total;
                         document.getElementById("couponMessage").innerText = "Coupon applied successfully!";
                         document.getElementById("couponMessage").style.color = "green";
+                        document.getElementById("copcancelbtn").innerText="cancelCoupon"
+                        document.getElementById("copcancelbtn").style.color="red"
                     } else {
                         document.getElementById("couponMessage").innerText = data.message;
                         document.getElementById("couponMessage").style.color = "red";
@@ -278,10 +283,13 @@ async function placeOrder(cartId, userId) {
     let selectedAddress = getSelectedAddress();
     let paymentMethod = getpaymentMethod();
     let subTotal=document.getElementById('totalAmount')
+    let couponCode=document.getElementById("couponSelect").value
     let subTotalvalue = subTotal.innerText.trim(); 
     let discountElement = document.getElementById("discountAmount");
-    let discountValue = discountElement.innerText.trim(); 
+    let discountValue = discountElement.innerText.trim();
+     
     console.log(discountValue);
+    
     
     
     console.log(paymentMethod);
@@ -304,7 +312,7 @@ async function placeOrder(cartId, userId) {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({amount : subTotalvalue })  // Replace with actual amount
+                body: JSON.stringify({amount : subTotalvalue})  // Replace with actual amount
             });
 
             let orderData = await response.json();
@@ -333,7 +341,8 @@ async function placeOrder(cartId, userId) {
                             selectedAddress, 
                             paymentMethod,
                             paymentId: response.razorpay_payment_i,
-                            subTotalvalue
+                            subTotalvalue,
+                            couponCode
 
                         })
                     })
@@ -388,7 +397,7 @@ async function placeOrder(cartId, userId) {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ cartId, userId, selectedAddress, paymentMethod,discountValue,subTotalvalue })
+                body: JSON.stringify({ cartId, userId, selectedAddress, paymentMethod,discountValue,subTotalvalue,couponCode })
             })
             .then(response => response.json()) 
             .then(result => {

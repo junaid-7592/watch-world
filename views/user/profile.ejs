@@ -174,28 +174,11 @@
                      <i class="fi-rs-shopping-bag mr-10"></i>Orders
                    </a>
                  </li>
-                 <!-- <li class="nav-item">
-                   <a class="nav-link" id="track-orders-tab" data-bs-toggle="tab" href="#track-orders" role="tab" aria-controls="track-orders" aria-selected="false">
-                      <i class="fi-rs-shopping-cart-check mr-10"></i>Wallet Status 
-                   </a>
-                 </li> -->
-
-                 <!-- <li class="nav-item">
-                   <a class="nav-link" id="track-orders-tab" data-bs-toggle="tab" href="#wallet-history" role="tab" aria-controls="track-orders" aria-selected="false">
-                     <i class="fi-rs-shopping-cart-check mr-10"></i>Wallet History
-                   </a>
-                 </li> -->
-
-
                  <li class="nav-item">
                   <a class="nav-link" id="wallet-history" href="/getWallet" role="tab">
                       <i class="fi-rs-shopping-cart-check mr-10"></i> Wallet History
                   </a>
               </li>
-              
-
-
-
                  <li class="nav-item">
                    <a class="nav-link" id="track-orders-tab" data-bs-toggle="tab" href="#referal" role="tab" aria-controls="track-orders" aria-selected="false">
                      <i class="fi-rs-shopping-cart-check mr-10"></i>Referals
@@ -303,13 +286,6 @@
                    </div>
                  </div>
                </div>
-
-
-
-
-
-
-               
                <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
                  <div class="card">
                    <div class="card-header">
@@ -342,6 +318,21 @@
                      </div>
                    </div>
                  </div>
+
+                 <div class="pagination">
+                  <% if (hasPreviousPage) { %>
+                      <a href="/profile?page=<%= currentPage - 1 %>" class="page-btn">Previous</a>
+                  <% } %>
+          
+                  <span class="page-info">
+                      Page <%= currentPage %> of <%= totalPages %>
+                  </span>
+          
+                  <% if (hasNextPage) { %>
+                      <a href="/profile?page=<%= currentPage + 1 %>" class="page-btn">Next</a>
+                  <% } %>
+              </div>
+
                </div>
 
 
@@ -454,7 +445,35 @@
   });
 </script>
 
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    let storedTab = localStorage.getItem("activeTab");
 
+    if (storedTab) {
+        let activeTab = document.querySelector(`.nav-link[href="${storedTab}"]`);
+        let activeContent = document.querySelector(storedTab);
+
+        if (activeTab && activeContent) {
+            document.querySelectorAll(".nav-link").forEach(tab => tab.classList.remove("active"));
+            document.querySelectorAll(".tab-pane").forEach(content => content.classList.remove("show", "active"));
+
+            activeTab.classList.add("active");
+            activeContent.classList.add("show", "active");
+        }
+    }
+
+    document.querySelectorAll(".nav-link").forEach(tab => {
+        tab.addEventListener("click", function (event) {
+            let targetTab = this.getAttribute("href");
+
+            if (targetTab.startsWith("#")) {
+                localStorage.setItem("activeTab", targetTab);
+            }
+        });
+    });
+});
+
+</script>
 
     
     

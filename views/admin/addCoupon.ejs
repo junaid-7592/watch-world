@@ -277,13 +277,14 @@
 
                         // Discount Value Validation
                         const discountVal = parseFloat(discountValue.value);
+                        console.log(discountType , discountVal)
                         if (!discountValue.value.trim()) {
                             setError(discountValue, "Discount value is required");
                         } else if (isNaN(discountVal) || discountVal <= 0) {
                             setError(discountValue, "Please enter a valid positive number");
-                        } else if (discountType.value === "percentage") {
-                            if (discountVal > 100) {
-                                setError(discountValue, "Percentage discount cannot exceed 100%");
+                        } else if (discountType.value == "percentage") {
+                            if (discountVal > 70) {
+                                setError(discountValue, "Percentage discount cannot exceed 70%");
                             } else if (discountVal < 1) {
                                 setError(discountValue, "Minimum percentage discount is 1%");
                             }

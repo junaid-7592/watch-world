@@ -116,6 +116,7 @@ router.get('/checkout',productController.getCheckout)
 router.get('/orderSuccess',auth.userAuth,productController.getOrderSuccess)
 router.post('/orderSuccess',auth.userAuth,productController.OrderSuccess)
 router.post('/order/cancel/:orderId',auth.userAuth,productController.cancelOrder)
+router.post('/order/return',auth.userAuth,productController.returnOrder)
 
 
 router.post("/create-orderRazorpay",auth.userAuth,productController.CreateOrderRazaorpay)
