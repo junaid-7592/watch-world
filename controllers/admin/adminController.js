@@ -69,161 +69,7 @@ const login = async (req, res) => {
     }
 }
 
-const loadDashboard = async (req, res) => {
-    try {
-        // Count products
-        const productCount = await Product.countDocuments();
-        const currentMonth = new Date().getMonth() + 1;
-        const productCountThisMonth = await Product.countDocuments({
-            createdAt: {
-                $gte: new Date(new Date().getFullYear(), currentMonth - 1, 1),
-                $lt: new Date(new Date().getFullYear(), currentMonth, 1)
-            }
-        });
 
-        // Count orders this month
-        const orderCountThisMonth = await Order.countDocuments({
-            createdAt: {
-                $gte: new Date(new Date().getFullYear(), currentMonth - 1, 1),
-                $lt: new Date(new Date().getFullYear(), currentMonth, 1)
-            }
-        });
-
-        // Count customers
-        const customers = await User.countDocuments();
-        const customersThisMonth = await User.countDocuments({
-            createdAt: {
-                $gte: new Date(new Date().getFullYear(), currentMonth - 1, 1),
-                $lt: new Date(new Date().getFullYear(), currentMonth, 1)
-            }
-        });
-
-        // Count categories
-        const categories = await Category.countDocuments();
-        const categoriesThisMonth = await Category.countDocuments({
-            createdAt: {
-                $gte: new Date(new Date().getFullYear(), currentMonth - 1, 1),
-                $lt: new Date(new Date().getFullYear(), currentMonth, 1)
-            }
-        });
-
-        // Fetch top-selling products
-        const topSellingProducts = await Order.aggregate([
-            { $unwind: "$orderedItems" },
-            {
-                $group: {
-                    _id: "$orderedItems.product",
-                    totalSales: { $sum: "$orderedItems.quantity" }
-                }
-            },
-            { $sort: { totalSales: -1 } },
-            { $limit: 10 },
-            {
-                $lookup: {
-                    from: "products",
-                    localField: "_id",
-                    foreignField: "_id",
-                    as: "productDetails"
-                }
-            },
-            { $unwind: "$productDetails" },
-            {
-                $project: {
-                    productName: "$productDetails.productName",
-                    totalSales: 1
-                }
-            }
-        ]);
-
-        // Fetch top categories
-        const topCategories = await Order.aggregate([
-            { $unwind: "$orderedItems" },
-            {
-                $lookup: {
-                    from: "products",
-                    localField: "orderedItems.product",
-                    foreignField: "_id",
-                    as: "productDetails"
-                }
-            },
-            { $unwind: "$productDetails" },
-            {
-                $lookup: {
-                    from: "categories",
-                    localField: "productDetails.category",
-                    foreignField: "_id",
-                    as: "categoryDetails"
-                }
-            },
-            { $unwind: "$categoryDetails" },
-            {
-                $group: {
-                    _id: "$categoryDetails.name",
-                    totalSales: { $sum: "$orderedItems.quantity" }
-                }
-            },
-            { $sort: { totalSales: -1 } },
-            { $limit: 5 }
-        ]);
-
-        // Fetch sales data for charts
-        const salesData = await Order.aggregate([
-            {
-                $group: {
-                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
-                    totalSales: { $sum: "$finalAmount" }
-                }
-            },
-            { $sort: { _id: 1 } }
-        ]);
-
-        console.log("sales  ",salesData);
-        
-
-        // Fetch order status data
-        const orderStatusData = await Order.aggregate([
-            {
-                $group: {
-                    _id: "$status",
-                    count: { $sum: 1 }
-                }
-            }
-        ]);
-          // console.log(productCount,productCountThisMonth,orderCountThisMonth,customers,customersThisMonth,categories,categoriesThisMonth)
-        //    console.log(topSellingProducts,topCategories,salesData,orderStatusData)
-
-        res.render("dashbord", {
-            productCount,
-            productCountThisMonth,
-            orderCountThisMonth,
-            customers,
-            customersThisMonth,
-            categories,
-            categoriesThisMonth,
-            topSellingProducts,
-            timePeriodsData:{
-                '7': {
-                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-                    sales: [100, 200, 150, 300],
-                    revenue: [500, 1000, 750, 1500],
-                    orderStatus: [10, 5, 15, 20]
-                },
-                '1': {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr'],
-                    sales: [300, 400, 350, 450],
-                    revenue: [1500, 2000, 1750, 2250],
-                    orderStatus: [25, 30, 40, 50]
-                }
-            },
-            topCategories,
-            salesData,
-            orderStatusData
-        });
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Server error');
-    }
-};
 
 
 
@@ -576,101 +422,11 @@ const exportExcel = async (req, res) => {
     }
 }
 
-const fetchSalesReport = async (req, res) => {
-    try {
-        const { reportType, startDate, endDate } = req.body;
 
-        // Build date filter
-        const dateFilter = {};
-        if (reportType) {
-            const now = new Date();
-            switch (reportType) {
-                case 'daily':
-                    dateFilter.createdAt = {
-                        $gte: new Date(now.setHours(0, 0, 0, 0)),
-                        $lt: new Date(now.setHours(23, 59, 59, 999))
-                    };
-                    break;
-                case 'weekly':
-                    const weekStart = new Date(now.setDate(now.getDate() - now.getDay()));
-                    dateFilter.createdAt = {
-                        $gte: new Date(weekStart.setHours(0, 0, 0, 0)),
-                        $lt: new Date(now)
-                    };
-                    break;
-                case 'monthly':
-                    dateFilter.createdAt = {
-                        $gte: new Date(now.getFullYear(), now.getMonth(), 1),
-                        $lt: new Date(now.getFullYear(), now.getMonth() + 1, 0)
-                    };
-                    break;
-                case 'custom':
-                    if (startDate && endDate) {
-                        dateFilter.createdAt = {
-                            $gte: new Date(startDate),
-                            $lt: new Date(new Date(endDate).setHours(23, 59, 59, 999))
-                        };
-                    }
-                    break;
-            }
-        }
-
-        // Fetch orders
-        const orders = await Order.find(dateFilter)
-            .populate('orderedItems.product')
-            .sort({ createdAt: -1 });
-
-        // Calculate statistics
-        const totalSales = orders.reduce((sum, order) => sum + order.finalAmount, 0);
-        const totalDiscounts = orders.reduce((sum, order) => sum + order.discount, 0);
-        const orderCount = orders.length;
-
-        res.json({ orders, totalSales, totalDiscounts, orderCount });
-
-    } catch (error) {
-        console.error('Fetch Sales Report Error:', error);
-        res.status(500).json({ error: 'Error fetching report' });
-    }
-};
-const getSalesReports = async (req, res) => {
-    try {
-        const filter = req.query.filter;
-        let startDate;
-
-        switch (filter) {
-            case '7':
-                startDate = new Date(new Date().setDate(new Date().getDate() - 7));
-                break;
-            case '30':
-                startDate = new Date(new Date().setDate(new Date().getDate() - 30));
-                break;
-            case '90':
-                startDate = new Date(new Date().setDate(new Date().getDate() - 90));
-                break;
-            case '180':
-                startDate = new Date(new Date().setDate(new Date().getDate() - 180));
-                break;
-            default:
-                startDate = new Date(new Date().setDate(1));
-        }
-
-        const salesReport = await Order.aggregate([
-            { $match: { createdAt: { $gte: startDate } } },
-            { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, totalSales: { $sum: "$finalAmount" }, totalOrders: { $sum: 1 }, totalDiscount: { $sum: "$discount" }, totalRevenue: { $sum: "$finalAmount" } } },
-            { $sort: { _id: 1 } }
-        ]);
-
-        res.json(salesReport);
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Server Error');
-    }
-};
 
 module.exports = {
     loadlogin,
     login,
-    loadDashboard,
     pageerror,
     logout,
     coupenManagmentListget,
@@ -681,8 +437,7 @@ module.exports = {
     exportExcel,
     exportPDF,
     getSalesreport,
-    getSalesReports,
-    fetchSalesReport
+  
 
 }
 

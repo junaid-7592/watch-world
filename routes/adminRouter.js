@@ -6,8 +6,10 @@ const customerController=require("../controllers/admin/customerController")
 const categoryController=require("../controllers/admin/categoryController")
 const productController=require("../controllers/admin/productController")
 const orderController=require("../controllers/admin/orderController")
+const dashboardController=require('../controllers/admin/dashboardController')
 const storage = require("../controllers/admin/productController");
 const upload = require("../config/multer");
+
 
 
 
@@ -31,7 +33,6 @@ router.get("/logout", (req, res) => {
     });
 });
 
-router.get('/', adminAuth,adminController.loadDashboard);
 router.post('/export-pdf', adminController.exportPDF);
 router.post('/export-excel', adminController.exportExcel);
 
@@ -91,10 +92,12 @@ router.put("/Updatecoupons",adminAuth,adminController.updateCoupon)
 
 
 router.get("/sales",adminAuth,adminController.getSalesreport)
-router.post('/fetch-sales-report',adminAuth,adminController.fetchSalesReport);
+router.post('/fetch-sales-report',adminAuth,dashboardController.fetchSalesReport);
 router.get('/export-pdf',adminAuth,adminController. exportPDF);
 router.get('/export-excel', adminAuth,adminController.exportExcel);
 
-router.get("/sales-report",adminAuth, adminController.getSalesReports);
+router.get("/sales-report",adminAuth, dashboardController.getSalesReports);
+router.get('/', adminAuth,dashboardController.loadDashboard);
+
 module.exports=router; 
                                     
