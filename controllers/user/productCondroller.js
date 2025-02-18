@@ -10,7 +10,12 @@ const Product = require("../../models/productSchema");
 const Cart = require("../../models/cartSchema");
 const Address=require("../../models/addressSchema")
 const Order=require("../../models/orderSChema")
-const Coupon=require("../../models/coupenSchema")
+const Coupon=require("../../models/coupenSchema");
+
+const PDFDocument = require("pdfkit");
+const fs = require("fs");
+const path = require("path");
+
 
 const Wishlist = require("../../models/wishlistSchema");
 
@@ -240,6 +245,7 @@ const getCheckout = async (req, res) => {
       const cart = await Cart.findOne({ userId }).populate("items.productId");
       const coupons = await Coupon.find();
       const addressData = await Address.find({ userId }).populate("address");
+      
   
     //   console.log("000000000000000", addressData);
     //   console.log("Fetched Address Data:", JSON.stringify(addressData, null, 2)); 
@@ -266,6 +272,7 @@ const getCheckout = async (req, res) => {
       }
   
       res.render("checkout", {
+    
         cart,
         coupons,
         subTotal: subtotal,
@@ -359,7 +366,10 @@ const OrderSuccess = async (req, res) => {
     try {
         const { userId, cartId, selectedAddress,paymentMethod,discountValue,subTotalvalue, couponCode} = req.body;
         // console.log("ths is order fdsxghf",req.body);
-        
+        if (paymentMethod === "cod" && subTotalvalue > 1000) {
+            return res.status(400).json({ message: "Cash on Delivery is not allowed for orders above ₹1000." });
+        }
+     
 
         // console.log({ userId, cartId, selectedAddress,paymentMethod,discountValue,subTotalvalue});
         
@@ -571,6 +581,41 @@ const razorpay = new Razorpay({
   };
 
 
+  const cancelOrderRazaorpay= async (req, res) => {
+    console.log("----------------------->")
+    try {
+
+
+        // const { orderId, status } = req.body;
+        // console.log(orderId)
+        const newOrder = new Order({
+            userId,
+            orderedItems: updatedItems,
+            discount:discountValue,
+            totalPrice:subTotalvalue,
+            paymentStatus:"unpaid",
+            finalAmount:subTotalvalue,
+            status:"Processing",
+            address:orderAddress ,
+            paymentMethod:paymentMethod,
+            coupenApplied:couponCode?true:false,
+            couponCode:couponCode
+        });
+
+        await newOrder.save();
+
+
+        await Order.findByIdAndUpdate(orderId, { paymentStatus: status });
+
+        res.status(200).json({ success: true, message: 'Order status updated successfully' });
+    } catch (error) {
+        console.error('Error updating order status:', error);
+        res.status(500).json({ success: false, message: 'Failed to update order status' });
+    }
+}
+
+
+
 
 // --------------------------------------------------------
 
@@ -700,6 +745,202 @@ const returnOrder = async (req, res) => {
 };
 
 
+const downloadInvoice = async (req, res) => {
+    try {
+        const orderId = req.params.orderId;
+        const order = await Order.findById(orderId)
+            .populate("userId")
+            .populate("orderedItems.product");
+
+        if (!order) {
+            return res.status(404).json({ message: "Order not found" });
+        }
+
+        // Setup directories
+        const invoiceDir = path.join(__dirname, "../invoices");
+        if (!fs.existsSync(invoiceDir)) {
+            fs.mkdirSync(invoiceDir, { recursive: true });
+        }
+
+        // Initialize PDF document
+        const doc = new PDFDocument({ 
+            size: 'A4',
+            margin: 50,
+            bufferPages: true
+        });
+        
+        const fileName = `invoice_${orderId}.pdf`;
+        const filePath = path.join(invoiceDir, fileName);
+
+        // Setup PDF streams
+        doc.pipe(fs.createWriteStream(filePath));
+        doc.pipe(res);
+
+        // Set response headers
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader("Content-Disposition", `attachment; filename=${fileName}`);
+
+        // Define styles
+        const styles = {
+            header: { fontSize: 28, font: 'Helvetica-Bold' },
+            subHeader: { fontSize: 24, font: 'Helvetica-Bold' },
+            sectionTitle: { fontSize: 14, font: 'Helvetica-Bold' },
+            normal: { fontSize: 12, font: 'Helvetica' },
+            small: { fontSize: 10, font: 'Helvetica' }
+        };
+
+        // Define colors
+        const colors = {
+            primary: '#2c3e50',
+            secondary: '#f8f9fa',
+            white: '#ffffff',
+            black: '#000000'
+        };
+
+        // Company Header
+        doc.font(styles.header.font)
+           .fontSize(styles.header.fontSize)
+           .text("YOUR COMPANY", { align: "center" });
+
+        // Invoice Title
+        doc.fontSize(styles.subHeader.fontSize)
+           .text("INVOICE", { align: "center" });
+
+        // Decorative Line
+        doc.moveDown()
+           .lineWidth(2)
+           .moveTo(50, doc.y)
+           .lineTo(545, doc.y)
+           .stroke(colors.primary)
+           .moveDown();
+
+        // Define columns
+        const leftColumn = 70;
+        const rightColumn = 350;
+
+        // Order Details (Left Column)
+        doc.font(styles.sectionTitle.font)
+           .fontSize(styles.sectionTitle.fontSize)
+           .text("ORDER DETAILS", leftColumn);
+        
+        doc.font(styles.normal.font)
+           .fontSize(styles.normal.fontSize)
+           .moveDown()
+           .text(`Order ID: ${order._id}`, leftColumn)
+           .text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`, leftColumn)
+           .text(`Payment Method: ${order.paymentMethod}`, leftColumn);
+
+        // Customer Details (Right Column)
+        doc.font(styles.sectionTitle.font)
+           .fontSize(styles.sectionTitle.fontSize)
+           .text("CUSTOMER DETAILS", rightColumn, doc.y - 85);
+        
+        doc.font(styles.normal.font)
+           .fontSize(styles.normal.fontSize)
+           .moveDown()
+           .text(`Name: ${order.userId.name || "N/A"}`, rightColumn)
+           .text(`Email: ${order.userId.email || "N/A"}`, rightColumn)
+           .text(`Address: ${order.address}`, rightColumn, null, {
+                width: 200,
+                align: 'left'
+           });
+
+        // Products Table
+        const tableTop = doc.y + 50;
+        const tableHeaders = {
+            number: { x: 50, width: 30 },
+            product: { x: 90, width: 250 },
+            price: { x: 340, width: 50 },
+            quantity: { x: 420, width: 50 },
+            total: { x: 480, width: 50 }
+        };
+
+        // Table Header Background
+        doc.fillColor(colors.primary)
+           .rect(50, tableTop - 20, 495, 25)
+           .fill();
+
+        // Table Headers
+        doc.fillColor(colors.white)
+           .font(styles.sectionTitle.font)
+           .fontSize(styles.normal.fontSize)
+           .text("No.", tableHeaders.number.x, tableTop - 15)
+           .text("Product Name", tableHeaders.product.x, tableTop - 15)
+           .text("Price", tableHeaders.price.x, tableTop - 15, { width: tableHeaders.price.width, align: "right" })
+           .text("Qty", tableHeaders.quantity.x, tableTop - 15, { width: tableHeaders.quantity.width, align: "right" })
+           .text("Total", tableHeaders.total.x, tableTop - 15, { width: tableHeaders.total.width, align: "right" });
+
+        // Product List
+        let currentY = tableTop + 15;
+        let subTotal = 0;
+
+        order.orderedItems.forEach((item, index) => {
+            const { 
+                productName = "Unknown",
+                salePrice = 0 
+            } = item.product || {};
+            
+            const total = salePrice * item.quantity;
+            subTotal += total;
+
+            // Alternate row background
+            if (index % 2 === 0) {
+                doc.fillColor(colors.secondary)
+                   .rect(50, currentY - 5, 495, 25)
+                   .fill();
+            }
+
+            doc.fillColor(colors.black)
+               .font(styles.normal.font)
+               .fontSize(styles.normal.fontSize)
+               .text(`${index + 1}`, tableHeaders.number.x, currentY)
+               .text(productName, tableHeaders.product.x, currentY)
+               .text(`${salePrice.toFixed(2)}`, tableHeaders.price.x, currentY, { width: tableHeaders.price.width, align: "right" })
+               .text(`${item.quantity}`, tableHeaders.quantity.x, currentY, { width: tableHeaders.quantity.width, align: "right" })
+               .text(`${total.toFixed(2)}`, tableHeaders.total.x, currentY, { width: tableHeaders.total.width, align: "right" });
+
+            currentY += 30;
+        });
+
+        // Total Section
+        const totalSection = currentY + 30;
+        
+        // Total Box
+        doc.rect(350, totalSection, 195, 100)
+           .fillAndStroke(colors.secondary, colors.primary);
+
+        // Total Amounts
+        doc.font(styles.sectionTitle.font)
+           .fontSize(styles.normal.fontSize)
+           .fillColor(colors.primary)
+           .text("Subtotal:", 370, totalSection + 20)
+           .text(`${subTotal.toFixed(2)}`, 480, totalSection + 20, { align: "right" });
+
+        if (order.discount > 0) {
+            doc.text("Discount:", 370, totalSection + 45)
+               .text(`-${order.discount.toFixed(2)}`, 480, totalSection + 45, { align: "right" });
+        }
+
+        doc.fontSize(styles.sectionTitle.fontSize)
+           .text("Final Amount:", 370, totalSection + 70)
+           .text(`${order.finalAmount.toFixed(2)}`, 480, totalSection + 70, { align: "right" });
+
+        // Footer
+        doc.font(styles.small.font)
+           .fontSize(styles.small.fontSize)
+           .text(
+               "Thank you for your business!",
+               50,
+               doc.page.height - 50,
+               { align: "center" }
+           );
+
+        doc.end();
+    } catch (error) {
+        console.error("Invoice generation error:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
 
 
 module.exports = {
@@ -720,4 +961,6 @@ module.exports = {
     removeFromWishlist,
     removeInWhishlist,
     returnOrder,
+    downloadInvoice,
+    cancelOrderRazaorpay,
 }

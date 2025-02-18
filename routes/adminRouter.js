@@ -95,5 +95,6 @@ router.post('/fetch-sales-report',adminAuth,adminController.fetchSalesReport);
 router.get('/export-pdf',adminAuth,adminController. exportPDF);
 router.get('/export-excel', adminAuth,adminController.exportExcel);
 
+router.get("/sales-report",adminAuth, adminController.getSalesReports);
 module.exports=router; 
                                     

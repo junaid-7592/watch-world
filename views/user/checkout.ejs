@@ -379,6 +379,56 @@ async function placeOrder(cartId, userId) {
 
             // Step 4: Open Razorpay Payment Window
             let rzp = new Razorpay(options);
+
+            
+
+					rzp.on('payment.failed', async function(response) {
+						try {
+							// Update order status to Failed
+							const updateResponse = await fetch('/failed-order', {
+								method: 'POST',
+								headers: {
+									'Content-Type': 'application/json'
+								},
+								body: JSON.stringify({
+                                    cartId, 
+                            userId, 
+                            selectedAddress, 
+                            paymentMethod,
+                            subTotalvalue,
+                            couponCode
+
+								})
+                              
+                                
+							});
+                            console.log(orderId);
+
+							if(!updateResponse.ok) {
+								throw new Error('Failed to update order status');
+							}
+
+							// Show failure message and redirect
+							await Swal.fire({
+								title: 'Payment Failed',
+								text: 'Payment failed, redirecting to orders page',
+								icon: 'error',
+								showConfirmButton: false,
+								timer: 10000,
+								timerProgressBar: true,
+								willClose: () => {
+									window.location.href = '/myAccount/orders';
+								}
+							});
+						} catch (error) {
+							console.error('Error handling payment failure:', error);
+							Swal.fire('Error', 'Something went wrong. Please try again.', 'error')
+								.then(() => {
+									window.location.href = '/myAccount/orders';
+								});
+						}
+					});
+
             rzp.open();
         } catch (error) {
             console.error("Razorpay Payment Error:", error);

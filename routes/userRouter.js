@@ -120,6 +120,8 @@ router.post('/order/return',auth.userAuth,productController.returnOrder)
 
 
 router.post("/create-orderRazorpay",auth.userAuth,productController.CreateOrderRazaorpay)
+router.post("/failed-orde",auth.userAuth,productController.cancelOrderRazaorpay)
+
 
 
 
@@ -136,6 +138,8 @@ router.get("/getWallet",auth.userAuth,walletController.showWallet)
 
 router.post("/refund/:orderId/",auth.userAuth,walletController.refundToWallet)
 
+// invoice download
+router.get("/download-invoice/:orderId", productController.downloadInvoice);
 
 
 
