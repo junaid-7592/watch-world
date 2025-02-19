@@ -314,7 +314,7 @@ async function placeOrder(cartId, userId) {
                 },
                 body: JSON.stringify({amount : subTotalvalue})  // Replace with actual amount
             });
-
+                    
             let orderData = await response.json();
             if (!orderData || !orderData.id) {
                 throw new Error("Failed to create Razorpay order");
@@ -343,7 +343,6 @@ async function placeOrder(cartId, userId) {
                             paymentId: response.razorpay_payment_i,
                             subTotalvalue,
                             couponCode
-
                         })
                     })
                     .then(res => res.json())
@@ -381,53 +380,54 @@ async function placeOrder(cartId, userId) {
             let rzp = new Razorpay(options);
 
             
+rzp.on('payment.failed', async function(response) {
+    
+    await Swal.fire({
+    title: 'Payment Failed',
+    text: 'Payment failed, redirecting to the checkout page',
+    icon: 'error',
+    showConfirmButton: true, 
+    confirmButtonText: 'OK', 
+    timer: null, 
+    timerProgressBar: false 
+}).then(() => {
+    window.location.href = `/profile`;
+});
+    try {
+        // Update order status to Failed
+        const updateResponse = await fetch('/failed-orderRazorpay', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                cartId, 
+                userId, 
+                selectedAddress, 
+                paymentMethod,
+                subTotalvalue,
+                couponCode,
+                discountValue,
+            })
+        });
 
-					rzp.on('payment.failed', async function(response) {
-						try {
-							// Update order status to Failed
-							const updateResponse = await fetch('/failed-order', {
-								method: 'POST',
-								headers: {
-									'Content-Type': 'application/json'
-								},
-								body: JSON.stringify({
-                                    cartId, 
-                            userId, 
-                            selectedAddress, 
-                            paymentMethod,
-                            subTotalvalue,
-                            couponCode
+        if (!updateResponse.ok) {
+            throw new Error('Failed to update order status');
+        }
 
-								})
-                              
-                                
-							});
-                            console.log(orderId);
+      
 
-							if(!updateResponse.ok) {
-								throw new Error('Failed to update order status');
-							}
+    } catch (error) {
+        console.error('Error handling payment failure:', error);
+        Swal.fire('Error', 'Something went wrong. Please try again.', 'error')
+            .then(() => {
+                window.history.back();
+                
+            });
+    }
+});
 
-							// Show failure message and redirect
-							await Swal.fire({
-								title: 'Payment Failed',
-								text: 'Payment failed, redirecting to orders page',
-								icon: 'error',
-								showConfirmButton: false,
-								timer: 10000,
-								timerProgressBar: true,
-								willClose: () => {
-									window.location.href = '/myAccount/orders';
-								}
-							});
-						} catch (error) {
-							console.error('Error handling payment failure:', error);
-							Swal.fire('Error', 'Something went wrong. Please try again.', 'error')
-								.then(() => {
-									window.location.href = '/myAccount/orders';
-								});
-						}
-					});
+				
 
             rzp.open();
         } catch (error) {

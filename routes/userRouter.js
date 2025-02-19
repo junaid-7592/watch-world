@@ -140,8 +140,8 @@ router.post("/refund/:orderId/",auth.userAuth,walletController.refundToWallet)
 
 // invoice download
 router.get("/download-invoice/:orderId", productController.downloadInvoice);
-
-
+router.post("/failed-orderRazorpay",productController. handleFailedOrder);
+router.post("/recreate-orderRazorpay",productController.recreateOrderRazorpay)
 
 module.exports = router;    
 

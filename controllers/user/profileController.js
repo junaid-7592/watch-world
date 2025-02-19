@@ -87,8 +87,8 @@ const forgotEmailValid = async (req, res) => {
 
       if (emailSend) {
         // Store OTP in session
-        req.session.userOtp = otp; // Correctly store OTP
-        req.session.userEmail = email; // Optional: Store email separately if needed
+        req.session.userOtp = otp;
+        req.session.userEmail = email; 
         console.log(req.session.userOtp, "from otp session");
 
         // Render OTP page
@@ -121,7 +121,7 @@ const coformationForgotpassword = async (req, res) => {
   console.log(newPassword, confirmPassword, 'Received passwords');
   try {
 
-    const userId = req.session.user; // Ensure session.user contains the user ID
+    const userId = req.session.user; 
     if (!userId) {
       return res.json({status:false,message:'User not found in Session'})
     }
@@ -131,7 +131,7 @@ const coformationForgotpassword = async (req, res) => {
       return res.json({status:false,message:'User not found'})
     }
 
-    // Validate that passwords match
+    
     if (newPassword !== confirmPassword) {
       return res.json({status:false,message:'Password is not matching'})
     }
@@ -161,7 +161,6 @@ const coformationForgotpassword = async (req, res) => {
 const userProfile=async(req,res)=>{
   try {
     
-//mukalil  import cheytha  oro  scheemayum  profile page load akumbol acces cheyth edukkan vendi
     const userId=req.session.user;
     const page = parseInt(req.query.page) || 1;
     const limit = 7; 
@@ -175,7 +174,7 @@ const userProfile=async(req,res)=>{
        const totalPages = Math.ceil(totalOrders / limit);
 
     const orders = await Order.find({userId})
-    .sort({ createdAt: -1 }) // Sort by creation date in descending order
+    .sort({ createdAt: -1 }) 
             .skip(skip)
             .limit(limit);
 
@@ -244,9 +243,9 @@ const changePasswordValid=async (req,res) => {
   
   } catch (error) {
       console.error('Error from change password',error);
-      res.status(500).send('Internal server error');
-    }
-   }
+    res.status(500).send('Internal server error');
+      }
+  }
 
 
 
