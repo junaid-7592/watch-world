@@ -98,6 +98,8 @@ router.get('/export-excel', adminAuth,adminController.exportExcel);
 
 router.get("/sales-report",adminAuth, dashboardController.getSalesReports);
 router.get('/', adminAuth,dashboardController.loadDashboard);
+router.post('/orders/filter',adminAuth,adminController.orderslistFilter)
 
-module.exports=router; 
+
+module.exports=router;      
                                     

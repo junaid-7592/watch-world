@@ -1,5 +1,5 @@
 const mongoose=require("mongoose");
-const {Schema}=mongoose;   // schema destructuring
+const {Schema}=mongoose;   
 
 
 const userSchema=new Schema({
@@ -41,7 +41,7 @@ const userSchema=new Schema({
        }] ,
     wallet:{
         type:Number,
-        default:0,      //initial balance is zero
+        default:0,     
     },
     wishlist:[{
         type:Schema.Types.ObjectId,
@@ -82,8 +82,6 @@ const userSchema=new Schema({
     }]
 
 })
-
-
 
 const User=mongoose.model("User",userSchema);
 module.exports=User;         

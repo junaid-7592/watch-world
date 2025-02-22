@@ -22,12 +22,12 @@ const categorySchema = new mongoose.Schema({
         default: Date.now,
     },
     image: {
-        type: String, // Correct usage
+        type: String, 
         required: false,
     }
 });
 
-// Note: The second argument in mongoose.model() should be the schema itself, not a string of its name
+
 const Category = mongoose.model("Category", categorySchema);
 
 module.exports = Category;

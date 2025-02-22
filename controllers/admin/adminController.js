@@ -421,6 +421,32 @@ const exportExcel = async (req, res) => {
         res.status(500).send('Error generating Excel file');
     }
 }
+    
+
+const orderslistFilter=async (req, res) => {
+    console.log("yyyyyyyyyyyyyyyyyyyy")
+    try {
+        const { orderID, paymentMethod, status, startDate, endDate } = req.body;
+
+        let filter = {};
+        if (orderID) filter._id = orderID;
+        if (paymentMethod) filter.paymentMethod = paymentMethod;
+        if (status) filter.status = status;
+
+        if (startDate || endDate) {
+            filter.createdAt = {};
+            if (startDate) filter.createdAt.$gte = new Date(startDate); // Start Date Filter
+            if (endDate) filter.createdAt.$lte = new Date(endDate); // End Date Filter
+        }
+        console.log(filter)
+        const orders = await Order.find(filter).sort({ createdAt: -1 });
+      
+        res.json({ orders });
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: 'Error fetching orders' });
+    }
+}
 
 
 
@@ -437,6 +463,7 @@ module.exports = {
     exportExcel,
     exportPDF,
     getSalesreport,
+    orderslistFilter,
   
 
 }

@@ -1,5 +1,5 @@
 const Product = require("../../models/productSchema");
-const Category = require("../../models/category"); // Ensure the path is correct
+const Category = require("../../models/category"); 
 
 const Order=require("../../models/orderSChema")
 const User = require("../../models/userSchema");
@@ -62,7 +62,7 @@ const addproducts = async (req, res) => {
                 quantity: products.quantity,
                 size: products.size,
                 color: products.color,
-                productImage: imagePaths, // Use the processed images array
+                productImage: imagePaths, 
                 status: 'Available',
             });
 

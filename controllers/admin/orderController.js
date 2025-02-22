@@ -7,32 +7,24 @@ const Transaction=require("../../models/transactionSchema")
 require("dotenv").config();
 
 
-// const showOrderList = async (req, res) => {
-//     try {
-//         const orders = await Order.find() 
-//         res.render('orderList', { orders })
-//     } catch (error) {
-//         console.error('Error fetching orders:', error)
-//         res.status(500).send('Server Error')
-//     }
-// };
+
 
 
 const showOrderList = async (req, res) => {
     try {
-        let page = parseInt(req.query.page) || 1; // Default to page 1
-        let limit = 10; // Number of orders per page
+        let page = parseInt(req.query.page) || 1; 
+        let limit = 10;
         let skip = (page - 1) * limit;
 
-        // Fetch orders with pagination and sort by createdAt (Descending)
+        
         const orders = await Order.find()
-            .sort({ createdAt: -1 }) // Sort by latest orders first
+            .sort({ createdAt: -1 }) 
             .skip(skip)
             .limit(limit)
-            .lean(); // Convert to plain JS object for performance
+            .lean(); 
 
         const totalOrders = await Order.countDocuments(); // Count total orders
-        const totalPages = Math.ceil(totalOrders / limit); // Calculate total pages
+        const totalPages = Math.ceil(totalOrders / limit); 
 
         res.render('orderList', { orders, currentPage: page, totalPages });
 
@@ -47,7 +39,7 @@ const showOrderList = async (req, res) => {
 
 const getViewOrderdetails=async(req,res)=>{
     try {
-        const orderId = req.params.id;//  varunna params nn id eduthu
+        const orderId = req.params.id;
           const order = await Order.findOne({ _id: orderId })
           .populate('userId')  
         .populate('orderedItems.product')
@@ -70,21 +62,21 @@ const getViewOrderdetails=async(req,res)=>{
 
 
 
-const updateStatus=  async (req, res) => {           //router.post("/orders/:orderId/update-status"
+const updateStatus=  async (req, res) => {           
 // console.log("koooooooooooooooooi   111111111111");
 
     try {
-        const { orderId } = req.params; // Get Order ID from URL
+        const { orderId } = req.params; 
         // console.log( "this comming from feach:",orderId);
         
-        const { status } = req.body; // Get new status from request body
+        const { status } = req.body; 
         
 
         // Update order status in MongoDB
         const updatedOrder = await Order.findByIdAndUpdate(
             orderId,
             { status: status },
-            { new: true } // Return updated document
+            { new: true } 
         );
 
         if (!updatedOrder) {

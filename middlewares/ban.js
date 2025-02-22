@@ -16,7 +16,7 @@ let banCheck = async (req, res, next) => {
                 req.session.user = null
                 res.locals.userCredit = false 
                 res.locals.userData = {}
-                //res.redirect("/login")
+                
             }
         })
         .catch(error=>{
@@ -31,4 +31,4 @@ let banCheck = async (req, res, next) => {
     return next();
 };
 
-module.exports = banCheck;
+module.exports = banCheck;

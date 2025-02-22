@@ -16,18 +16,18 @@ const refundToWallet = async (req, res) => {
         const userId=req.session.user
         // console.log(userId)
         
-        const { orderId, amount } = req.body// Taking user ID, order ID, and refund amount
+        const { orderId, amount } = req.body
         
         //  console.log("222222222",orderId)
         //  console.log("33333333333",amount)
         if ( !orderId || !amount) {
 
-            return res.status(400).json({ message: 'All details required.******* 55555555555' }); // Checking if any data is missing
+            return res.status(400).json({ message: 'All details required.******* 55555555555' }); 
         }
 
         
 
-        let wallet = await Wallet.findOne({ userId}); // Checking if the user already has a wallet
+        let wallet = await Wallet.findOne({ userId}); 
         // console.log("-------------------------");
         
         console.log(wallet)

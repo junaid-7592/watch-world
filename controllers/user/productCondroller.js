@@ -99,7 +99,7 @@ const addTocart = async (req, res) => {
 
 
         }
-        const price = product.salePrice || product.regularPrice; // Use salePrice if available, otherwise use regularPrice
+        const price = product.salePrice || product.regularPrice; 
         // console.log("price is", price);
 
         // console.log("price  is", price)
@@ -254,7 +254,7 @@ const getCheckout = async (req, res) => {
 
 
         if (!cart) {
-            return res.status(404).redirect("/Cart"); // Added return to prevent further execution
+            return res.status(404).redirect("/Cart"); 
         }
 
         // Calculate subtotal
@@ -631,7 +631,7 @@ const cancelOrderRazaorpay = async (req, res) => {
 // Get wishlist items
 const getWishlist = async (req, res) => {
     try {
-        const userId = req.user.id; // Assuming user is authenticated
+        const userId = req.user.id; 
         const wishlist = await Wishlist.findOne({ userId }).populate('products.productId');
 
         res.render('wishlist', { wishlist: wishlist ? wishlist.products : [] });

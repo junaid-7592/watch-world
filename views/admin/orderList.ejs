@@ -118,41 +118,71 @@
 <body>
     <div class="container">
         <h1>Order Details</h1>
-        
+<!--         
         <div class="search-bar">
             <input type="text" placeholder="Search orders...">
-        </div>
+        </div> -->
+        
+        <!-- <input type="text" id="searchOrder" placeholder="Search Order ID"> -->
 
-        <table>
+        <!-- Payment Filter -->
+        <select id="filterPayment" onchange="filterOrders()">
+            <option value="">All Payment Methods</option>
+            <option value="cod">Cash on Delivery</option>
+            <option value="onlinepayment">Online Payment</option>
+        </select>
+        
+        <!-- Status Filter -->
+        <select id="filterStatus" onchange="filterOrders()">
+            <option value="">All Status</option>
+            <option value="Pending">Pending</option>
+            <option value="Processing">Processing</option>
+            <option value="Delivered">Delivered</option>
+            <option value="Shipped">Shipped</option>
+            <option value="Cancelled">Cancelled</option>
+            <option value="Return-Request">Return-Request</option>
+            <option value="Returned">Returned</option>
+            <option value="failed">failed</option>
+        </select>
+        
+        <!-- Date Range Filters -->
+        <label>Start Date:</label>
+        <input type="date" id="startDate" onchange="filterOrders()">
+        <label>End Date:</label>
+        <input type="date" id="endDate" onchange="filterOrders()">
+        
+        <!-- <button onclick="filterOrders()">Filter</button> -->
+        
+        <table id="orderTable">
             <thead>
                 <tr>
                     <th>ID</th>
                     <th>Order ID</th>
                     <th>Date</th>
-                    <th>discount</th>
+                    <th>Discount</th>
                     <th>Total Amount</th>
                     <th>Payment Method</th>
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                <%orders%>
+            <tbody id="orderBody">
                 <% orders.forEach((order, index) => { %>
                 <tr>
                     <td><%= (currentPage - 1) * 10 + index + 1 %></td>
-                    
-                    <td>ORD-2025-<%= order._id %></td> 
+                    <td>ORD-2025-<%= order._id %></td>
                     <td><%= new Date(order.createdAt).toDateString() %></td>
                     <td><%= order.discount %></td>
-                    <td><%=order.totalPrice%></td>
-                    <td><span class="payment-method cod"></span><%= order.paymentMethod  %></td>
-                    <td><span class="status pending"><%=order.status%></span></td>
+                    <td><%= order.totalPrice %></td>
+                    <td><%= order.paymentMethod %></td>
+                    <td><%= order.status %></td>
                     <td><a href="/admin/viewOrderdetails/<%= order._id %>" class="view-btn">View</a></td>
                 </tr>
                 <% }) %>
             </tbody>
         </table>
+        
+       
                 <!-- Pagination -->
                 <div class="pagination">
                     <% if (currentPage > 1) { %>
@@ -169,5 +199,56 @@
         </body>
         
     </div>
+    <script>
+        function filterOrders() {
+   // const orderID = document.getElementById('searchOrder').value.trim();
+    const paymentMethod = document.getElementById('filterPayment').value;
+    const status = document.getElementById('filterStatus').value;
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+
+    const filters = {};
+
+    // if (orderID) filters.orderID = orderID;
+    if (paymentMethod) filters.paymentMethod = paymentMethod;
+    if (status) filters.status = status;
+    if (startDate) filters.startDate = startDate;
+    if (endDate) filters.endDate = endDate;
+    
+    console.log(filters)
+
+    fetch('/admin/orders/filter', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(filters)
+    })
+    .then(response => response.json())
+    .then(data => {
+        const orderBody = document.getElementById('orderBody');
+        orderBody.innerHTML = "";  // Clear old data
+
+        data.orders.forEach((order, index) => {
+            orderBody.innerHTML += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>ORD-2025-${order._id}</td>
+                    <td>${new Date(order.createdAt).toDateString()}</td>
+                    <td>${order.discount}</td>
+                    <td>${order.totalPrice}</td>
+                    <td>${order.paymentMethod}</td>
+                    <td>${order.status}</td>
+                    <td><a href="/admin/viewOrderdetails/${order._id}" class="view-btn">View</a></td>
+                </tr>
+            `;
+        });
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+    </script>
+    
 </body>
 </html>
+

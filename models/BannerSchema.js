@@ -1,6 +1,6 @@
 
 
-// banner means came to fist slide in home page 
+
 
 const mongoose=require("mongoose");
 const {Schema}=mongoose;
