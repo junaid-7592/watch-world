@@ -342,6 +342,7 @@ async function placeOrder(cartId, userId) {
                             paymentMethod,
                             paymentId: response.razorpay_payment_i,
                             subTotalvalue,
+                            discountValue,
                             couponCode
                         })
                     })
