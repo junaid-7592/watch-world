@@ -16,22 +16,11 @@ const upload = require("../config/multer");
 
 
 router.get("/pageerror", adminController.pageerror);
-router.get("/login", (req, res) => {
-    if (req.session.admin) {
-        return res.redirect('/admin/');
-    }
-    return adminController.loadlogin(req, res);
-});
+router.get("/login",adminController.pageLogin) 
+   
 router.post("/login", adminController.login); 
-router.get("/logout", (req, res) => {
-    req.session.destroy((err) => {
-        if (err) {
-            console.log("Logout error:", err);
-            return res.redirect('/pageerror');
-        }
-        res.redirect('/admin/login');
-    });
-});
+router.get("/logout",adminController.pageLogout)
+
 
 router.post('/export-pdf', adminController.exportPDF);
 router.post('/export-excel', adminController.exportExcel);

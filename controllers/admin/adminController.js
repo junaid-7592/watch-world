@@ -71,6 +71,16 @@ const login = async (req, res) => {
 
 
 
+const pageLogin=async(req,res)=>{
+    if (req.session.admin) {
+           return res.redirect('/admin/');
+       }
+       return loadlogin(req, res);
+    
+}
+
+
+
 
 
 const logout = async (req, res) => {
@@ -90,6 +100,18 @@ const logout = async (req, res) => {
     }
 }
 
+
+
+const pageLogout=async (req,res)=>{
+    req.session.destroy((err) => {
+        if (err) {
+            console.log("Logout error:", err);
+            return res.redirect('/pageerror');
+        }
+        res.redirect('/admin/login');
+    });
+
+}
 
 const coupenManagmentListget = async (req, res) => {
     try {
@@ -454,11 +476,13 @@ module.exports = {
     loadlogin,
     login,
     pageerror,
+    pageLogin,
     logout,
     coupenManagmentListget,
     addNewCoupon,
     newCouponAdd,
     lodeUpdateCoupon,
+    pageLogout,
     updateCoupon,
     exportExcel,
     exportPDF,

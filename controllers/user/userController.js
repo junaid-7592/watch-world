@@ -441,6 +441,37 @@ const getSortedProducts = async (req, res) => {
 };
 
 
+const googleverify=async(req, res, next) => {
+        console.log("from google auth");
+        
+        passport.authenticate('google', (err, user, info) => {
+            console.log("1");
+            
+            if (err || !user) {
+                // Render the signup page with the error message
+                const errorMessage = info?.message || "An error occurred during authentication";
+            console.log(user,err);
+                return res.redirect('/signup');
+            }
+
+            req.logIn(user, (loginErr) => {
+                if (loginErr) {
+                    return res.redirect('/signup');
+                }
+
+                // Store user data in the session
+                req.session.user = user._id;
+                req.session.userData = user;
+
+                res.redirect('/');
+            });
+        })(req, res, next);
+    }
+
+
+
+
+
 
 module.exports={
     loadHomepage,
@@ -448,6 +479,7 @@ module.exports={
     loadSignup,
     loadlogin,
     signup,
+    googleverify,
     verifyOtp,
     resendOtp,
     login,

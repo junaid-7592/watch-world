@@ -4,7 +4,7 @@ const userController = require("../controllers/user/userController");
 const passport = require("passport");
 const profileController=require("../controllers/user/profileController")
 const productController = require('../controllers/user/productCondroller')
-// const Transaction = require('../models/Transaction'); // Check if this file exis
+
 const walletController = require('../controllers/user/walletController')
 
 
@@ -30,34 +30,8 @@ router.post("/resend-otp", userController.resendOtp);
 
 router.get("/auth/google", passport.authenticate('google', { scope: ['profile', 'email'] }));  //name email  nn edukkunnu
 
-router.get('/auth/google/callback',
-    (req, res, next) => {
-        console.log("from google auth");
-        
-        passport.authenticate('google', (err, user, info) => {
-            console.log("1");
-            
-            if (err || !user) {
-                // Render the signup page with the error message
-                const errorMessage = info?.message || "An error occurred during authentication";
-            console.log(user,err);
-                return res.redirect('/signup');
-            }
+router.get('/auth/google/callback',userController.googleverify)
 
-            req.logIn(user, (loginErr) => {
-                if (loginErr) {
-                    return res.redirect('/signup');
-                }
-
-                // Store user data in the session
-                req.session.user = user._id;
-                req.session.userData = user;
-
-                res.redirect('/');
-            });
-        })(req, res, next);
-    }
-);
 
 router.get("/shop",userController.shopget)
 router.get("/products",userController.getSortedProducts);
