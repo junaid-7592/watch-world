@@ -170,13 +170,13 @@
                 <img src="<%= item.productId.productImage[0] %>" alt="Product" class="product-image" width="80">
                 <div class="product-details">
                     <div class="product-name"><%= item.productId.productName %></div>
-                    <div class="product-price">$<%= item.productId.salePrice %></div>
+                    <div class="product-price">₹<%= item.productId.salePrice %></div>
                     <div class="quantity-controls">
                         <span class="quantity">Qty: <%= item.quantity %></span>
                     </div>
                 </div>
                 <b>Total</b>
-                <div class="subtotal">$<%= (item.productId.salePrice * item.quantity).toFixed(2) %></div>
+                <div class="subtotal">₹<%= (item.productId.salePrice * item.quantity).toFixed(2) %></div>
             </div>
             <% }); %>
         
@@ -211,7 +211,7 @@
             <div class="total-section">
                 <div class="product-item">
                     <strong>Total</strong>
-                    <strong>$<span id="totalAmount"><%= total.toFixed(2) %></span></strong>
+                    <strong>₹<span id="totalAmount"><%= total.toFixed(2) %></span></strong>
                 </div>
             </div>
         

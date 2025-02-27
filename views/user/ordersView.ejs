@@ -299,12 +299,12 @@
                     </div>
                 </div>
 
-                <%if(order.status!=='Cancelled' && order.status!=="Delivered" &&order.status!=="Return-Request" && order.status !== "Returned"){%>
+                <!-- <%if(order.status!=='Cancelled' && order.status!=="Delivered" &&order.status!=="Return-Request" && order.status !== "Returned"){%>
                     <div style="text-align: center; margin-top: 2rem;">
                         <a href="#" id="cancelOrder" class="btn btn-primary">Cancel</a>
                     </div>
 
-                    <%}%>
+                    <%}%> -->
 
                         <%if(order.status=="Delivered"){%>
                             <div style="text-align: center; margin-top: 2rem;">
@@ -318,6 +318,11 @@
 
 
                                 <div style="text-align: center; margin-top: 2rem;">
+                                    <%if(order.status!=='Cancelled' && order.status!=="Delivered" &&order.status!=="Return-Request" && order.status !== "Returned"){%>
+                                       
+                                            <a href="#" id="cancelOrder" class="btn btn-primary">Cancel</a>
+                    
+                                        <%}%>
                                     <a href="/" class="btn btn-primary">Back To Home</a>
                                
                                 <button id="downloadInvoice" class="btn btn-outline-primary btn-uniform" data-order-id="<%= order._id %>">

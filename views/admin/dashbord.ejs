@@ -94,11 +94,11 @@
             <div class="stats-icon">
               <i class="fas fa-dollar-sign"></i>
             </div>
-            <div class="stats-value">$<%= totalRevenue ? totalRevenue.toLocaleString() : '0' %></div>
+            <div class="stats-value">₹<%= totalRevenue ? totalRevenue.toLocaleString() : '0' %></div>
             <div class="stats-label">Total Revenue</div>
             <div class="stats-trend <%= totalRevenueThisMonth > 0 ? 'positive' : 'negative' %>">
               <i class="fas <%= totalRevenueThisMonth > 0 ? 'fa-arrow-up' : 'fa-arrow-down' %>"></i>
-              $<%= totalRevenueThisMonth ? totalRevenueThisMonth.toLocaleString() : '0' %> this month
+              ₹<%= totalRevenueThisMonth ? totalRevenueThisMonth.toLocaleString() : '0' %> this month
             </div>
           </div>
         </div>
@@ -247,7 +247,7 @@
                           <h6><%= product.productName %></h6>
                           <p>SKU: <%= product.sku %> | Units Sold: <%= product.totalSales.toLocaleString() %></p>
                         </div>
-                        <div class="sales-value">$<%= product.revenue.toLocaleString() %></div>
+                        <div class="sales-value">₹<%= product.revenue.toLocaleString() %></div>
                       </div>
                     </div>
                     <% }); %>
@@ -266,7 +266,7 @@
                           <h6><%= category.name %></h6>
                           <p>Total Items: <%= category.items.toLocaleString() %> | Units Sold: <%= category.itemsSold.toLocaleString() %></p>
                         </div>
-                        <div class="sales-value">$<%= category.totalSales.toLocaleString() %></div>
+                        <div class="sales-value">₹<%= category.totalSales.toLocaleString() %></div>
                       </div>
                     </div>
                     <% }); %>
@@ -384,7 +384,7 @@ function updateCharts(data) {
     data: {
       labels: labels,
       datasets: [{
-        label: 'Sales ($)',
+        label: 'Sales (₹)',
         data: salesData,
         borderColor: 'rgb(59, 125, 221)',
         backgroundColor: 'rgba(59, 125, 221, 0.1)',
@@ -437,10 +437,10 @@ function updateCharts(data) {
           position: 'left',
           title: {
             display: true,
-            text: 'Sales ($)'
+            text: 'Sales (₹)'
           },
           ticks: {
-            callback: value => '$' + value.toLocaleString()
+            callback: value => '₹' + value.toLocaleString()
           }
         },
         y1: {

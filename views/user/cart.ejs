@@ -43,7 +43,7 @@
                                                         <%= item.productId.productName %>
                                                     </a></h2>
                                             </td>
-                                            <td class="th-price">$<%= item.price.toFixed(2) %></td>
+                                            <td class="th-price">₹<%= item.price.toFixed(2) %></td>
                                             <td class="th-qty">
                                                 <div class="d-flex align-items-center">
                                                     <button class="btn btn-sm btn-outline-secondary"
@@ -61,7 +61,7 @@
                                                     </button>
                                                 </div>
                                             </td>
-                                            <td class="th-total" id="total-<%= item._id %>">$<%= (item.price * item.quantity).toFixed(2) %></td>
+                                            <td class="th-total" id="total-<%= item._id %>">₹<%= (item.price * item.quantity).toFixed(2) %></td>
                                         </tr>
                                     <% }) %>
                                 </tbody>
@@ -74,17 +74,17 @@
                                 <div class="shopping-cost">
                                     <div class="shopping-cost-right">
                                         <% let grandTotal = 0; %>
-                                        <% cart.items.forEach((item) => { 
+                                        ₹<% cart.items.forEach((item) => { 
                                             let subTotal = item.price * item.quantity;
                                             grandTotal += subTotal;
                                         %>
-                                            <p id="subTotal<%= item._id %>">$<%= subTotal.toFixed(2) %></p>
+                                            <p id="subTotal<%= item._id %>">₹<%= subTotal.toFixed(2) %></p>
                                         <% }) %>
-                                        <p id="grandTotal">$<%= grandTotal.toFixed(2) %></p>
+                                        <p id="grandTotal">₹<%= grandTotal.toFixed(2) %></p>
                                     </div>
                                     <div class="shopping-cost-left">
                                         <% cart.items.forEach((item) => { %>
-                                            <p class="floatright"><%= item.productId.productName %></p>
+                                            <p class="floatright">₹<%= item.productId.productName %></p>
                                         <% }) %>
                                         <p>GRAND TOTAL</p>
                                     </div>
