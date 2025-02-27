@@ -74,7 +74,7 @@
                                 <div class="shopping-cost">
                                     <div class="shopping-cost-right">
                                         <% let grandTotal = 0; %>
-                                        ₹<% cart.items.forEach((item) => { 
+                                        <% cart.items.forEach((item) => { 
                                             let subTotal = item.price * item.quantity;
                                             grandTotal += subTotal;
                                         %>
@@ -84,7 +84,7 @@
                                     </div>
                                     <div class="shopping-cost-left">
                                         <% cart.items.forEach((item) => { %>
-                                            <p class="floatright">₹<%= item.productId.productName %></p>
+                                            <p class="floatright"><%= item.productId.productName %></p>
                                         <% }) %>
                                         <p>GRAND TOTAL</p>
                                     </div>
@@ -172,7 +172,7 @@
                             }
 
                             if (totalElement) {
-                                totalElement.textContent = `$${total}`;
+                                totalElement.textContent = `₹${total}`;
                             }
 
                             // Call updateCartTotals after updating the quantity and item total
@@ -254,7 +254,7 @@
                             const itemSubtotal = item.subTotal;  // Use the subTotal returned from the backend
                             const subTotalElement = document.getElementById(`subTotal${item._id}`);
                             if (subTotalElement) {
-                                subTotalElement.textContent = `$${itemSubtotal.toFixed(2)}`;
+                                subTotalElement.textContent = `₹${itemSubtotal.toFixed(2)}`;
                             }
                         });
                     }
@@ -262,7 +262,7 @@
                     // Update the grand total dynamically
                     const grandTotalElement = document.getElementById('grandTotal');
                     if (grandTotalElement) {
-                        grandTotalElement.textContent = `$${data.grandTotal.toFixed(2)}`;
+                        grandTotalElement.textContent = `₹${data.grandTotal.toFixed(2)}`;
                     }
 
                 } catch (error) {
