@@ -25,7 +25,7 @@ app.use(session({
   resave:false,
   saveUninitialized:true,
   cookie:{
-    secure:false,
+    secure: process.env.NODE_ENV === 'production',
     httpOnly:true,
     maxAge:72*60*60*1000
   }
@@ -66,8 +66,9 @@ app.use(userlog)
 app.use("/", userRouter);
 app.use("/admin",adminRouter);  
  
-app.listen(process.env.PORT, () => {      
-  console.log(process.env.LOCAL_HOST);
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {      
+  console.log(`Server running on ${process.env.LOCAL_HOST || 'http://localhost:' + PORT}`);
 });
 
 module.exports = app;                                  
